@@ -393,11 +393,70 @@ run_suggest_changes() {
     sed "s/Codex Version: $local_version/Codex Version: $new_version/" "$readme_to_update" > "$temp_readme" && mv "$temp_readme" "$readme_to_update"
     log_info "Updated Codex Version in $readme_to_update to $new_version."
 
-    # Placeholder for further steps (3.7 onwards)
-    log_info "Suggest changes: Initial setup complete. PR Title: '$pr_title', Fork: '$pr_fork_name', Branch: '$pr_branch_name'."
+    # Task 3.7: Commit changes
+    log_info "Committing changes to branch '$pr_branch_name' in cloned repository..."
+    (cd "$CLONE_DIR" && git add "$CODEX_DIR") || log_error "Failed to stage '$CODEX_DIR' for commit."
+    commit_message="feat(codex): Update codex from project suggestion
+
+Version: $new_version
+
+$pr_title
+
+$pr_body"
+    (cd "$CLONE_DIR" && git commit -m "$commit_message") || log_error "Failed to commit changes."
+    log_info "Changes committed successfully."
+
+    # Task 3.8: Add fork as remote and push
+    local fork_remote_name="userfork"
+    local fork_repo_url="https://github.com/$pr_fork_name.git"
+    log_info "Adding remote '$fork_remote_name' for fork '$fork_repo_url'..."
+    (cd "$CLONE_DIR" && git remote add "$fork_remote_name" "$fork_repo_url") || log_error "Failed to add remote for fork."
     
-    # For now, just a placeholder
-    echo "Forge suggest-changes command - Further implementation needed."
+    log_info "Pushing branch '$pr_branch_name' to '$fork_remote_name' ($fork_repo_url)..."
+    if ! (cd "$CLONE_DIR" && git push -u "$fork_remote_name" "$pr_branch_name"); then
+        log_error "Failed to push branch to fork. Check fork name, permissions, and network."
+        # Provide manual instructions
+        log_info "To proceed manually:"
+        log_info "1. Navigate to the cloned directory: cd $CLONE_DIR"
+        log_info "2. Ensure your fork '$pr_fork_name' is a remote: git remote add $fork_remote_name $fork_repo_url (if not already done)"
+        log_info "3. Push the branch: git push -u $fork_remote_name $pr_branch_name"
+        log_info "4. Then create a Pull Request on GitHub from branch '$pr_branch_name' of '$pr_fork_name' to the main ai-forge repository."
+        exit 1 # Exit as we can't proceed to PR creation
+    fi
+    log_info "Branch pushed successfully to fork."
+
+    # Task 3.9 & 3.10: Create PR using gh or provide manual instructions
+    local head_branch_for_pr="${pr_fork_name%/*}:$pr_branch_name" # Extracts username from fork_name and appends branch
+
+    if check_gh_installed; then
+        log_info "Attempting to create Pull Request using GitHub CLI 'gh'..."
+        # Use -R to target the main framework repository
+        # The --head flag should be in format 'OWNER:branch' or 'branch' if pushing to same repo.
+        # Since we pushed to a fork, gh should pick it up if the fork is configured.
+        # Or we can be explicit with --head user:branch.
+        # The `gh pr create` command is interactive by default if title/body not given.
+        # We have title and body, so we can pass them.
+        if (cd "$CLONE_DIR" && gh pr create --base main --head "$pr_branch_name" --title "$pr_title" --body "$pr_body" --repo "$AI_FORGE_REPO_URL"); then
+            log_info "Pull Request created successfully!"
+        else
+            log_error "Failed to create Pull Request using 'gh'. It might be due to authentication, or other issues."
+            log_info "Please try creating the Pull Request manually on GitHub."
+            log_info "Your changes are in branch '$pr_branch_name' on your fork '$pr_fork_name'."
+            log_info "Target the 'main' branch of $AI_FORGE_REPO_URL."
+        fi
+    else
+        log_info "'gh' CLI not found or not working. Please create the Pull Request manually on GitHub."
+        log_info "1. Go to your fork: https://github.com/$pr_fork_name"
+        log_info "2. You should see a prompt to create a Pull Request from the branch '$pr_branch_name'."
+        log_info "3. If not, navigate to the 'Pull requests' tab and click 'New pull request'."
+        log_info "4. Set the base repository to '$AI_FORGE_REPO_URL' and base branch to 'main'."
+        log_info "5. Set the head repository to '$pr_fork_name' and compare branch to '$pr_branch_name'."
+        log_info "6. Use the following for title and body:"
+        log_info "   Title: $pr_title"
+        log_info "   Body:\n$pr_body"
+    fi
+    
+    log_info "Forge suggest-changes process completed."
 }
 
 
