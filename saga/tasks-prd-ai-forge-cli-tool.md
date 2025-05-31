@@ -52,7 +52,7 @@
   - [ ] 3.2 Implement prompts for PR information:
     - [x] 3.2.1 Prompt for PR title.
     - [x] 3.2.2 Prompt for PR body (multiline).
-    - [ ] 3.2.3 Prompt for user's GitHub fork name (e.g., `username/ai-forge`).
+    - [x] 3.2.3 Prompt for user's GitHub fork name (e.g., `username/ai-forge`).
     - [ ] 3.2.4 Implement re-prompting loop for title, body, and fork name if initial input is invalid (empty or incorrect format).
     - [ ] 3.2.5 Implement validation for GitHub fork name format (e.g., `owner/repo`, checking for valid characters).
   - [ ] 3.3 Implement logic to temporarily clone the framework repository (`https://github.com/MarcelDanz/ai-forge.git`) into `TEMP_DIR` (FR3.2). The `TEMP_DIR` should be created by this step and cleaned up by step 3.12.

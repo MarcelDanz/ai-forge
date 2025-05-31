@@ -239,6 +239,10 @@ run_suggest_changes() {
     pr_body="${pr_body%\\n}"
     log_info "PR Body entered." # Not logging the body itself to keep logs concise
 
+    local user_fork
+    read -r -p "Enter your GitHub fork name (e.g., username/ai-forge): " user_fork
+    log_info "User fork entered: '$user_fork'"
+
     # Further implementation will follow in subsequent tasks.
 }
 
