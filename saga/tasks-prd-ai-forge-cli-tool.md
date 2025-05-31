@@ -35,7 +35,7 @@
   - [x] 1.10 Add informative status messages for the user during the `init` process.
 
 - [ ] 2.0 Implement `forge update` command functionality (FR2)
-  - [ ] 2.1 Implement argument parsing within `bin/forge` for the `update` subcommand.
+  - [x] 2.1 Implement argument parsing within `bin/forge` for the `update` subcommand.
   - [ ] 2.2 Implement logic to fetch the latest version of the `codex` folder from the framework repository (FR2.1).
   - [ ] 2.3 Implement a user prompt: "Do you want to back up the existing 'codex' folder? [y/N]" (FR2.3).
   - [ ] 2.4 If user confirms backup, implement logic to copy the existing `codex` folder to `codex.bak` before replacement (FR2.3).

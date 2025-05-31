@@ -77,9 +77,7 @@ run_init() {
         # trap will ensure cleanup_temp_dir is called
     fi
 
-    # Subsequent tasks (1.4-1.8) will handle copying from $TEMP_DIR to the current directory.
-    
-    # Task 1.4: Copy codex folder
+    # Copy codex folder
     if [ -d "$TEMP_DIR/$CODEX_DIR" ]; then
         log_info "Copying '$CODEX_DIR' folder to current directory..."
         # Remove existing codex dir first to ensure clean overwrite, then copy.
@@ -93,7 +91,7 @@ run_init() {
         log_info "No '$CODEX_DIR' folder found in fetched files. Skipping copy."
     fi
 
-    # Task 1.5: Create lore directory if it doesn't exist
+    # Create lore directory if it doesn't exist
     if [ ! -d "./$LORE_DIR" ]; then
         log_info "Creating './$LORE_DIR' directory..."
         mkdir -p "./$LORE_DIR"
@@ -102,7 +100,7 @@ run_init() {
         log_info "'./$LORE_DIR' directory already exists. Skipping creation."
     fi
 
-    # Task 1.6: Copy lore/README.md
+    # Copy lore/README.md
     local lore_readme_path_temp="$TEMP_DIR/$LORE_DIR/README.md"
     local lore_readme_path_project="./$LORE_DIR/README.md"
     if [ -f "$lore_readme_path_temp" ]; then
@@ -117,7 +115,7 @@ run_init() {
         log_info "No '$LORE_DIR/README.md' found in fetched files. Skipping copy."
     fi
 
-    # Task 1.7: Create saga directory if it doesn't exist
+    # Create saga directory if it doesn't exist
     if [ ! -d "./$SAGA_DIR" ]; then
         log_info "Creating './$SAGA_DIR' directory..."
         mkdir -p "./$SAGA_DIR"
@@ -126,7 +124,7 @@ run_init() {
         log_info "'./$SAGA_DIR' directory already exists. Skipping creation."
     fi
 
-    # Task 1.8: Copy saga/README.md
+    # Copy saga/README.md
     local saga_readme_path_temp="$TEMP_DIR/$SAGA_DIR/README.md"
     local saga_readme_path_project="./$SAGA_DIR/README.md"
     if [ -f "$saga_readme_path_temp" ]; then
