@@ -217,7 +217,13 @@ check_gh_installed() {
 # Function to handle the suggest-changes command logic
 run_suggest_changes() {
     # Content to be re-implemented based on revised tasks
-    log_info "Executing 'suggest-changes' command (re-implementation pending)..."
+    log_info "Executing 'suggest-changes' command..."
+
+    local pr_title
+    read -r -p "Enter the title for your Pull Request: " pr_title
+    log_info "PR Title entered: '$pr_title'"
+
+    # Further implementation will follow in subsequent tasks.
 }
 
 

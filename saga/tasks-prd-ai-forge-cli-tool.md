@@ -50,7 +50,7 @@
   - Note: Refer to `gh pr create` manual for detailed options: https://cli.github.com/manual/gh_pr_create
   - [x] 3.1 Implement argument parsing within `bin/forge.sh` for the `suggest-changes` subcommand.
   - [ ] 3.2 Implement prompts for PR information:
-    - [ ] 3.2.1 Prompt for PR title.
+    - [x] 3.2.1 Prompt for PR title.
     - [ ] 3.2.2 Prompt for PR body (multiline).
     - [ ] 3.2.3 Prompt for user's GitHub fork name (e.g., `username/ai-forge`).
     - [ ] 3.2.4 Implement re-prompting loop for title, body, and fork name if initial input is invalid (empty or incorrect format).
