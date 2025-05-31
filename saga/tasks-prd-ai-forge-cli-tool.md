@@ -1,6 +1,6 @@
 ## Relevant Files
 
-- `bin/forge`: Main executable shell script for the CLI tool. This script will handle subcommand routing.
+- `bin/forge.sh`: Main executable shell script for the CLI tool. This script will handle subcommand routing.
 - `bin/forge-init.sh`: (Optional) Script dedicated to `init` command logic.
 - `bin/forge-update.sh`: (Optional) Script dedicated to `update` command logic.
 - `bin/forge-suggest-changes.sh`: (Optional) Script dedicated to `suggest-changes` command logic.
@@ -15,7 +15,7 @@
 ### Notes
 
 - Shell scripts should be placed in a `bin` directory.
-- Ensure scripts are executable (`chmod +x bin/forge`).
+- Ensure scripts are executable (e.g., `chmod +x bin/forge.sh`).
 - Consider using a shell testing framework like `shunit2` or `bats-core` for automated tests.
 - For `forge suggest-changes`, robust testing will require careful mocking of git remote operations or a dedicated test repository.
 - All user-facing messages should be clear and informative, especially error messages.
@@ -81,11 +81,11 @@
   - [ ] 5.1 Add a "Prerequisites" section to `README.md` (e.g., `git`, optionally `gh`).
   - [ ] 5.2 Draft "Installation" section in `README.md`:
     - [ ] 5.2.1 Explain cloning the `ai-forge` repository.
-    - [ ] 5.2.2 Explain creating a `bin` directory if it doesn't exist and placing/symlinking `forge` script there.
-    - [ ] 5.2.3 Explain making the `forge` script executable (`chmod +x bin/forge`).
-    - [ ] 5.2.4 Provide clear instructions on adding the `bin` directory to the system's PATH for common shells (e.g., bash, zsh), including adding the export command to `.bashrc`/`.zshrc`.
+    - [ ] 5.2.2 Explain creating a `bin` directory if it doesn't exist and placing the `forge.sh` script there. Suggest creating a symlink for convenience (e.g., `cd bin; ln -s forge.sh forge`) so the command can be called as `forge`.
+    - [ ] 5.2.3 Explain making the `forge.sh` script executable (e.g., `chmod +x bin/forge.sh`).
+    - [ ] 5.2.4 Provide clear instructions on adding the `bin` directory to the system's PATH for common shells (e.g., bash, zsh), including adding the export command to `.bashrc`/`.zshrc`. This allows calling `forge.sh` (or `forge` if symlinked) from any directory.
   - [ ] 5.3 Draft "Usage" section in `README.md`:
-    - [ ] 5.3.1 Brief overview of the `forge` CLI tool.
+    - [ ] 5.3.1 Brief overview of the `forge` CLI tool (mentioning it can be called as `forge` if symlinked/aliased or `forge.sh` directly).
     - [ ] 5.3.2 Example for `forge init`.
     - [ ] 5.3.3 Example for `forge update`, mentioning the backup prompt.
     - [ ] 5.3.4 Example for `forge suggest-changes`, mentioning prompts for PR title, description, and fork name.
