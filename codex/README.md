@@ -10,6 +10,8 @@ The Codex is the AI agent’s rulebook -- a canonical source of truth for:
 
 used in this project.
 
+Codex Version: 0.1.0
+
 ## Purpose
 
 This directory exists to guide and constrain AI-assisted development. Whether used with Aider, or custom autonomous development assistants, and any LLM, the Codex defines:
