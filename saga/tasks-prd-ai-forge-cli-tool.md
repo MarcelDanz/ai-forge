@@ -34,16 +34,16 @@
   - [x] 1.9 Add verbose error handling for git operations, file system operations, and network issues (FR4.2).
   - [x] 1.10 Add informative status messages for the user during the `init` process.
 
-- [ ] 2.0 Implement `forge update` command functionality (FR2)
+- [x] 2.0 Implement `forge update` command functionality (FR2)
   - [x] 2.1 Implement argument parsing within `bin/forge` for the `update` subcommand.
-  - [ ] 2.2 Implement logic to fetch the latest version of the `codex` folder from the framework repository (FR2.1).
-  - [ ] 2.3 Implement a user prompt: "Do you want to back up the existing 'codex' folder? [y/N]" (FR2.3).
-  - [ ] 2.4 If user confirms backup, implement logic to copy the existing `codex` folder to `codex.bak` before replacement (FR2.3).
-  - [ ] 2.5 Implement logic to completely replace the existing `codex` folder in the current project directory with the fetched version (FR2.2).
-  - [ ] 2.6 Ensure the `codex/README.md` in the project's updated `codex` folder correctly reflects the fetched version number (FR2.4).
-  - [ ] 2.7 Add verbose error handling for git operations, file system operations, and user input (FR4.2).
-  - [ ] 2.8 Add informative status messages for the user during the `update` process.
-  - [ ] 2.9 Implement cleanup of any temporary files or directories created during the fetch/update process.
+  - [x] 2.2 Implement logic to fetch the latest version of the `codex` folder from the framework repository (FR2.1).
+  - [x] 2.3 Implement a user prompt: "Do you want to back up the existing 'codex' folder? [y/N]" (FR2.3).
+  - [x] 2.4 If user confirms backup, implement logic to copy the existing `codex` folder to `codex.bak` before replacement (FR2.3).
+  - [x] 2.5 Implement logic to completely replace the existing `codex` folder in the current project directory with the fetched version (FR2.2).
+  - [x] 2.6 Ensure the `codex/README.md` in the project's updated `codex` folder correctly reflects the fetched version number (FR2.4).
+  - [x] 2.7 Add verbose error handling for git operations, file system operations, and user input (FR4.2).
+  - [x] 2.8 Add informative status messages for the user during the `update` process.
+  - [x] 2.9 Implement cleanup of any temporary files or directories created during the fetch/update process.
 
 - [ ] 3.0 Implement `forge suggest-changes` command functionality (FR3)
   - Note: Refer to `gh pr create` manual for detailed options: https://cli.github.com/manual/gh_pr_create

@@ -142,6 +142,76 @@ run_init() {
     log_info "Forge init process completed successfully."
 }
 
+# --- Update Command Functions ---
+
+# Function to handle the update command logic
+run_update() {
+    check_git_installed
+    # TEMP_DIR is global and will be set here for cleanup by the existing trap
+    TEMP_DIR=$(mktemp -d)
+    if [ -z "$TEMP_DIR" ]; then
+        log_error "Failed to create temporary directory for update."
+    fi
+    # trap cleanup_temp_dir EXIT INT TERM is already set by run_init or will be set if update is called first
+    # To be safe, ensure trap is set if this function could be called independently
+    # However, given current structure, TEMP_DIR is global and trap is set once.
+    # If run_init wasn't called, TEMP_DIR might not be cleaned.
+    # Let's ensure the trap is active for this function's scope too.
+    # A single global TEMP_DIR and a single trap is fine.
+
+    log_info "Fetching latest '$CODEX_DIR' from $AI_FORGE_REPO_URL into $TEMP_DIR..."
+
+    if git archive --remote="$AI_FORGE_REPO_URL" HEAD "$CODEX_DIR" | tar -x -C "$TEMP_DIR"; then
+        log_info "Successfully fetched '$CODEX_DIR'."
+        if [ -d "$TEMP_DIR/$CODEX_DIR" ]; then
+            ls "$TEMP_DIR/$CODEX_DIR" # List contents of fetched codex for confirmation
+        else
+            log_error "Fetched archive, but '$CODEX_DIR' not found within it."
+        fi
+    else
+        log_error "Failed to fetch '$CODEX_DIR' from repository."
+    fi
+
+    # Subsequent tasks will handle backup, replacement, version check, and cleanup.
+
+    # Task 2.3: Prompt for backup
+    local backup_confirmed=""
+    if [ -d "./$CODEX_DIR" ]; then # Only ask if there's something to back up
+        read -r -p "Do you want to back up the existing '$CODEX_DIR' folder? [y/N] " response
+        if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+            backup_confirmed="yes"
+            # Task 2.4: Perform backup
+            local backup_dir="${CODEX_DIR}.bak"
+            log_info "Backing up existing './$CODEX_DIR' to './$backup_dir'..."
+            if [ -d "./$backup_dir" ]; then
+                log_info "Removing existing backup directory './$backup_dir'..."
+                rm -rf "./$backup_dir"
+            fi
+            cp -R "./$CODEX_DIR" "./$backup_dir"
+            log_info "Backup complete: './$CODEX_DIR' copied to './$backup_dir'."
+        else
+            log_info "Skipping backup of existing '$CODEX_DIR'."
+        fi
+    fi
+
+    # Task 2.5: Replace existing codex with fetched version
+    if [ -d "$TEMP_DIR/$CODEX_DIR" ]; then
+        log_info "Replacing './$CODEX_DIR' with the fetched version..."
+        if [ -d "./$CODEX_DIR" ]; then
+            rm -rf "./$CODEX_DIR" # Remove current codex before copying new one
+        fi
+        cp -R "$TEMP_DIR/$CODEX_DIR" "./$CODEX_DIR"
+        log_info "'./$CODEX_DIR' has been updated."
+    else
+        # This case should ideally be caught earlier by the fetch logic,
+        # but as a safeguard:
+        log_error "Fetched '$CODEX_DIR' not found in temporary directory. Update aborted before replacement."
+    fi
+    
+    log_info "Forge update process completed successfully."
+}
+
+
 # --- Main Command Dispatch ---
 
 # Check if any command is provided
@@ -157,10 +227,7 @@ case "$COMMAND" in
         run_init "$@" # Pass any further arguments if init were to accept them
         ;;
     update)
-        log_info "Executing 'update' command..."
-        # Placeholder for update command logic
-        # Source: saga/tasks-prd-ai-forge-cli-tool.md - Task 2.0
-        echo "forge update command - To be implemented"
+        run_update "$@" # Pass any further arguments if update were to accept them
         ;;
     suggest-changes)
         log_info "Executing 'suggest-changes' command..."
