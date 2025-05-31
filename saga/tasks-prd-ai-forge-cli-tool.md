@@ -48,7 +48,7 @@
 
 - [ ] 3.0 Implement `forge suggest-changes` command functionality (FR3) (Note: Tasks below are re-structured based on feedback)
   - Note: Refer to `gh pr create` manual for detailed options: https://cli.github.com/manual/gh_pr_create
-  - [ ] 3.1 Implement argument parsing within `bin/forge.sh` for the `suggest-changes` subcommand.
+  - [x] 3.1 Implement argument parsing within `bin/forge.sh` for the `suggest-changes` subcommand.
   - [ ] 3.2 Implement prompts for PR information:
     - [ ] 3.2.1 Prompt for PR title.
     - [ ] 3.2.2 Prompt for PR body (multiline).
