@@ -23,7 +23,7 @@
 ## Tasks
 
 - [ ] 1.0 Implement `forge init` command functionality (FR1)
-  - [ ] 1.1 Create the main `bin/forge` script file with basic structure for subcommand dispatch.
+  - [x] 1.1 Create the main `bin/forge` script file with basic structure for subcommand dispatch.
   - [ ] 1.2 Implement argument parsing within `bin/forge` to recognize the `init` subcommand and its options.
   - [ ] 1.3 Implement logic to fetch/clone only the required `codex` folder, `lore/README.md`, and `saga/README.md` from `https://github.com/MarcelDanz/ai-forge.git` (FR1.1). (Consider `git archive` or sparse checkout).
   - [ ] 1.4 Implement logic to copy the fetched `codex` folder to the current project directory, overwriting if it exists (FR1.3).
