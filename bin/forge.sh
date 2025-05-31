@@ -220,7 +220,14 @@ run_suggest_changes() {
     log_info "Executing 'suggest-changes' command..."
 
     local pr_title
-    read -r -p "Enter the title for your Pull Request: " pr_title
+    while true; do
+        read -r -p "Enter the title for your Pull Request: " pr_title
+        if [ -n "$pr_title" ]; then
+            break
+        else
+            log_info "PR title cannot be empty. Please try again."
+        fi
+    done
     log_info "PR Title entered: '$pr_title'"
 
     local pr_body_lines=()
@@ -233,14 +240,38 @@ run_suggest_changes() {
         pr_body_lines+=("$line")
     done
     local pr_body
-    # Join array elements with newline
-    printf -v pr_body '%s\n' "${pr_body_lines[@]}"
-    # Remove trailing newline if present from printf
-    pr_body="${pr_body%\\n}"
+    while true; do
+        # Join array elements with newline
+        printf -v pr_body '%s\n' "${pr_body_lines[@]}"
+        # Remove trailing newline if present from printf
+        pr_body="${pr_body%\\n}"
+        
+        if [ -n "$pr_body" ]; then # Check if body is non-empty
+            break
+        else
+            log_info "PR body cannot be empty. Please enter at least one line for the body."
+            # Reset for re-prompting
+            pr_body_lines=() 
+            log_info "Enter the body for your Pull Request (leave an empty line to finish):"
+            while IFS= read -r line; do
+                if [ -z "$line" ]; then
+                    break
+                fi
+                pr_body_lines+=("$line")
+            done
+        fi
+    done
     log_info "PR Body entered." # Not logging the body itself to keep logs concise
 
     local user_fork
-    read -r -p "Enter your GitHub fork name (e.g., username/ai-forge): " user_fork
+    while true; do
+        read -r -p "Enter your GitHub fork name (e.g., username/ai-forge): " user_fork
+        if [ -n "$user_fork" ]; then
+            break
+        else
+            log_info "GitHub fork name cannot be empty. Please try again."
+        fi
+    done
     log_info "User fork entered: '$user_fork'"
 
     # Further implementation will follow in subsequent tasks.
