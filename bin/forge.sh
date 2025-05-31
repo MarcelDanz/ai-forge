@@ -93,6 +93,15 @@ run_init() {
         log_info "No '$CODEX_DIR' folder found in fetched files. Skipping copy."
     fi
 
+    # Task 1.5: Create lore directory if it doesn't exist
+    if [ ! -d "./$LORE_DIR" ]; then
+        log_info "Creating './$LORE_DIR' directory..."
+        mkdir -p "./$LORE_DIR"
+        log_info "'./$LORE_DIR' directory created."
+    else
+        log_info "'./$LORE_DIR' directory already exists. Skipping creation."
+    fi
+
     log_info "Init process: Fetching and initial codex copy complete."
 }
 
