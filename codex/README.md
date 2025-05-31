@@ -1,5 +1,6 @@
 
 # Codex
+Codex Version: 0.1.0
 
 The Codex is the AI agent’s rulebook -- a canonical source of truth for:
 
@@ -9,8 +10,6 @@ The Codex is the AI agent’s rulebook -- a canonical source of truth for:
 - and code examples
 
 used in this project.
-
-Codex Version: 0.1.0
 
 ## Purpose
 

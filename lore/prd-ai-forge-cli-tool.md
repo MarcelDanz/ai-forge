@@ -25,36 +25,43 @@ The goal of the AI Forge CLI tool is to provide a simple, command-line interface
 ## 4. Functional Requirements
 
 ### FR1: `forge init` Command
-*   **FR1.1:** The `forge init` command SHALL fetch the `codex`, `lore`, and `saga` folders from the official AI Forge framework repository located at `https://github.com/MarcelDanz/ai-forge.git`.
-*   **FR1.2:** The command SHALL copy these folders into the current directory where the command is executed.
+*   **FR1.1:** The `forge init` command SHALL fetch the `codex` folder, the `lore/README.md` file, and the `saga/README.md` file from the official AI Forge framework repository located at `https://github.com/MarcelDanz/ai-forge.git`.
+*   **FR1.2:** The command SHALL copy the fetched `codex` folder into the current directory. It SHALL create the `lore` and `saga` directories if they do not exist. It SHALL then copy the fetched `lore/README.md` into the `lore` directory and `saga/README.md` into the `saga` directory.
 *   **FR1.3:** If a `codex` folder already exists in the target project directory, it SHALL be overridden by the version from the framework.
-*   **FR1.4:** If `lore` or `saga` folders do not exist in the target project directory, they SHALL be created and populated from the framework.
-*   **FR1.5:** If `lore` or `saga` folders already exist, their existing content SHALL NOT be modified by this command.
+*   **FR1.4:** The `lore` and `saga` directories SHALL be created if they do not exist in the target project directory. The `lore/README.md` and `saga/README.md` files from the framework SHALL be copied into their respective directories.
+*   **FR1.5:** If `lore/README.md` or `saga/README.md` files already exist in the target project directory, they SHALL NOT be overwritten. Other contents within existing `lore` or `saga` folders SHALL NOT be modified by this command.
 
 ### FR2: `forge update` Command
 *   **FR2.1:** The `forge update` command SHALL fetch the latest version of the `codex` folder from the AI Forge framework repository.
 *   **FR2.2:** The command SHALL completely replace the existing `codex` folder in the current project directory with the fetched version.
-*   **FR2.3:** The command SHALL offer an option (e.g., a flag like `--backup`) to automatically create a backup of the project's existing `codex` folder, naming it `codex.bak`, before replacement.
+*   **FR2.3:** The command SHALL prompt the user (e.g., "Do you want to back up the existing 'codex' folder? [y/N]") to confirm if they want to create a backup. If confirmed, the backup SHALL be named `codex.bak` and created before replacement.
 *   **FR2.4:** The command SHALL ensure the `codex/README.md` file within the project's newly updated `codex` folder reflects the correct SemVer version number of the fetched `codex`.
 
 ### FR3: `forge suggest-changes` Command
 *   **FR3.1:** The `forge suggest-changes` command SHALL facilitate proposing changes from the project's local `codex` folder to the AI Forge framework repository.
 *   **FR3.2:** The command SHALL (internally) clone the AI Forge framework repository, create a new branch, and replace the `codex` folder in this branch with the project's local `codex` folder.
-*   **FR3.3:** The command SHALL then commit these changes and attempt to create a pull request on the `https://github.com/MarcelDanz/ai-forge.git` repository. The user must have `git` and potentially GitHub CLI (`gh`) configured for authentication.
+*   **FR3.3:** The command SHALL prompt the user for a title and a description for the pull request. It SHALL also prompt the user for the name of their GitHub fork (e.g., `username/ai-forge`) to push the changes to. The command SHALL then commit the changes, push the new branch to the specified user fork, and attempt to create a pull request against the main `https://github.com/MarcelDanz/ai-forge.git` repository. The user must have `git` and potentially GitHub CLI (`gh`) configured for authentication.
 *   **FR3.4:** If the process of preparing changes (e.g., pushing the new branch or creating the PR) fails (e.g., due to inability to push to a remote, or other git errors), the command SHALL inform the user with a verbose error message. It SHOULD advise the user to ensure their project's `codex` is up-to-date with the framework (e.g., by running `forge update`, manually resolving any conflicts) and then try `forge suggest-changes` again.
-*   **FR3.5:** The pull request created SHALL be clearly titled and described, indicating it contains suggested changes to the `codex` from a project.
+*   **FR3.5:** The pull request created SHALL use the title and description provided by the user.
 
 ### FR4: General CLI Behavior
 *   **FR4.1:** The CLI tool SHALL be implemented as one or more simple `.sh` (shell script) files.
 *   **FR4.2:** All commands SHALL provide verbose error messages to assist the user in diagnosing and resolving issues.
 *   **FR4.3:** The CLI tool SHALL provide a help mechanism (e.g., `forge --help`, `forge <command> --help`, or a dedicated `forge help <command>`) that explains the purpose, usage, and potential consequences of each command.
-*   **FR4.4:** Commands SHALL execute their primary actions without requiring interactive confirmation prompts from the user. The help documentation should serve as the primary source of information regarding command consequences.
+*   **FR4.4:** Commands SHALL generally execute their primary actions without requiring interactive confirmation prompts. However, `forge update` SHALL prompt for backup confirmation, and `forge suggest-changes` SHALL prompt for pull request title, description, and fork information. The help documentation should serve as the primary source of information regarding command consequences for other actions.
 
 ### FR5: Codex Versioning
 *   **FR5.1:** The `codex` folder within the main AI Forge framework repository MUST contain a `README.md` file.
 *   **FR5.2:** This `codex/README.md` file MUST include a version identifier for the codex (e.g., `Codex Version: 1.0.0`). This version MUST follow the Semantic Versioning 2.0.0 standard (MAJOR.MINOR.PATCH).
 *   **FR5.3:** The `forge update` command (as per FR2.4) MUST ensure the version number in the project's local `codex/README.md` is updated to match the version of the `codex` it fetched.
-*   **FR5.4:** When changes are proposed via `forge suggest-changes`, the review process for the pull request should include consideration of whether the changes warrant an increment to the `codex` version number according to SemVer rules. The CLI tool itself is not required to automatically bump the version in the PR.
+*   **FR5.4:** When changes are proposed via `forge suggest-changes`, the CLI tool SHALL automatically determine and apply the appropriate Semantic Version bump (PATCH or MINOR only) for the `codex`. Major version changes are outside the scope of this automated feature. It SHALL update the `Codex Version` in the `codex/README.md` file within the new branch before creating the pull request. The determination SHALL follow these rules:
+    *   A **MINOR** version bump (e.g., 0.1.0 to 0.2.0) is applied if significant changes are detected. This includes:
+        *   Addition or removal of entire files within the `codex` directory.
+        *   Addition or removal of substantial sections, multiple rules, or entire workflows in existing `codex` files.
+    *   A **PATCH** version bump (e.g., 0.1.0 to 0.1.1) is applied if only minor changes are detected. This includes:
+        *   Corrections to a few words or typo fixes.
+        *   Minor clarifications that do not alter core rules or add/remove functionality.
+    *   The tool will analyze the diff of the `codex` directory to make this determination.
 
 ## 5. Non-Goals (Out of Scope)
 
@@ -96,8 +103,8 @@ The goal of the AI Forge CLI tool is to provide a simple, command-line interface
 
 ## 9. Open Questions
 
-*   **OQ1:** For `forge suggest-changes`: Should the script explicitly ask the user for the name of their fork or attempt to infer it? (Current assumption: relies on user's `git` remote configuration or `gh`'s ability to handle forks).
-*   **OQ2:** For `codex` versioning (related to FR5.4): While the PR submitter isn't required to bump the version, should `forge suggest-changes` include a reminder in its output or in the PR body to consider a version bump if the changes are significant?
+*   **OQ1 (Resolved):** For `forge suggest-changes`, the tool will prompt the user for their fork name (see FR3.3).
+*   **OQ2 (Resolved):** For `codex` versioning, the tool will automatically handle version bumping as per FR5.4.
 
 ---
 This PRD is based on the initial feature description and subsequent clarifications. It should be considered a living document and may be updated as the project progresses.
