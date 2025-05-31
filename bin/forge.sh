@@ -169,13 +169,11 @@ run_update() {
 
     # Subsequent tasks will handle backup, replacement, version check, and cleanup.
 
-    # Task 2.3: Prompt for backup
     local backup_confirmed=""
     if [ -d "./$CODEX_DIR" ]; then # Only ask if there's something to back up
         read -r -p "Do you want to back up the existing '$CODEX_DIR' folder? [y/N] " response
         if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
             backup_confirmed="yes"
-            # Task 2.4: Perform backup
             local backup_dir="${CODEX_DIR}.bak"
             log_info "Backing up existing './$CODEX_DIR' to './$backup_dir'..."
             if [ -d "./$backup_dir" ]; then
@@ -189,7 +187,6 @@ run_update() {
         fi
     fi
 
-    # Task 2.5: Replace existing codex with fetched version
     if [ -d "$TEMP_DIR/$CODEX_DIR" ]; then
         log_info "Replacing './$CODEX_DIR' with the fetched version..."
         if [ -d "./$CODEX_DIR" ]; then
