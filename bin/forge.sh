@@ -280,12 +280,6 @@ run_suggest_changes() {
             continue
         fi
         
-        # Further check: ensure owner and repo parts are not empty (covered by regex for non-empty before/after slash)
-        # The regex ^[a-zA-Z0-9-]+/[a-zA-Z0-9_.-]+$ ensures:
-        # 1. Owner part: one or more alphanumeric or hyphen.
-        # 2. Repo part: one or more alphanumeric, underscore, period, or hyphen.
-        # This implicitly checks that neither part is empty and that there's exactly one slash.
-
         break # Valid format
     done
     log_info "User fork entered: '$user_fork'"
