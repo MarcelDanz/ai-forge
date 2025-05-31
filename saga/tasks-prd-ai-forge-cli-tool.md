@@ -16,8 +16,7 @@
 
 - Shell scripts should be placed in a `bin` directory.
 - Ensure scripts are executable (e.g., `chmod +x bin/forge.sh`).
-- `TEMP_DIR` is used by `init` and `update` for temporary storage of `git archive` contents.
-- `CLONE_DIR` is used by `suggest-changes` for the temporary `git clone` of the framework repository. These are distinct and serve different commands.
+- `TEMP_DIR` is used by `init` and `update` for temporary storage of `git archive` contents, and by `suggest-changes` for the temporary `git clone` of the framework repository.
 - Consider using a shell testing framework like `shunit2` or `bats-core` for automated tests.
 - For `forge suggest-changes`, robust testing will require careful mocking of git remote operations or a dedicated test repository.
 - All user-facing messages should be clear and informative, especially error messages.
@@ -56,9 +55,9 @@
     - [ ] 3.2.3 Prompt for user's GitHub fork name (e.g., `username/ai-forge`).
     - [ ] 3.2.4 Implement re-prompting loop for title, body, and fork name if initial input is invalid (empty or incorrect format).
     - [ ] 3.2.5 Implement validation for GitHub fork name format (e.g., `owner/repo`, checking for valid characters).
-  - [ ] 3.3 Implement logic to temporarily clone the framework repository (`https://github.com/MarcelDanz/ai-forge.git`) into `CLONE_DIR` (FR3.2).
+  - [ ] 3.3 Implement logic to temporarily clone the framework repository (`https://github.com/MarcelDanz/ai-forge.git`) into `TEMP_DIR` (FR3.2). The `TEMP_DIR` should be created by this step and cleaned up by step 3.12.
   - [ ] 3.4 Implement pre-change checks:
-    - [ ] 3.4.1 Fetch framework's `codex/README.md` from its default branch (e.g., `main` or `HEAD` of the clone) to get the current framework Codex version.
+    - [ ] 3.4.1 Fetch framework's `codex/README.md` from its default branch (e.g., `main` or `HEAD` of the clone in `TEMP_DIR`) to get the current framework Codex version.
     - [ ] 3.4.2 Read local project's `codex/README.md` to get the local Codex version.
     - [ ] 3.4.3 Compare local Codex version with framework's version. If local version is older (e.g., 0.1.0 vs 0.2.0), log error instructing user to run `forge update` first, then exit. (Requires SemVer comparison logic).
     - [ ] 3.4.4 Check if local `./$CODEX_DIR` directory exists. If not, log error "Local './$CODEX_DIR' directory not found. Nothing to suggest." and exit.
@@ -67,11 +66,11 @@
     - [ ] 3.6.1 Replace the `codex` folder in the new branch of the cloned repository with the project's local `codex` folder.
     - [ ] 3.6.2 Commit these `codex` changes to the new branch (e.g., "feat(codex): Apply local codex changes").
   - [ ] 3.7 Determine and apply Codex version bump (FR5.4):
-    - [ ] 3.7.1 Analyze differences between the new branch (with local changes) and the framework's main branch using `git diff` (e.g., `git diff --name-status main..HEAD` or `git diff --shortstat main..HEAD` within `CLONE_DIR`).
+    - [ ] 3.7.1 Analyze differences between the new branch (with local changes) and the framework's main branch using `git diff` (e.g., `git diff --name-status main..HEAD` or `git diff --shortstat main..HEAD` within `TEMP_DIR`).
     - [ ] 3.7.2 Based on FR5.4 rules (file additions/removals, substantial content changes vs. minor textual changes), determine if a MINOR or PATCH version bump is needed.
     - [ ] 3.7.3 Read the current version from `codex/README.md` in the new branch (this is the user's local version before bumping).
     - [ ] 3.7.4 Increment the version number according to SemVer rules.
-    - [ ] 3.7.5 Update the `Codex Version:` line in the `codex/README.md` file (in the new branch within `CLONE_DIR`).
+    - [ ] 3.7.5 Update the `Codex Version:` line in the `codex/README.md` file (in the new branch within `TEMP_DIR`).
     - [ ] 3.7.6 Commit the version bump to the new branch (e.g., "chore(codex): Bump version to X.Y.Z").
   - [ ] 3.8 Add user's specified fork as a remote and push the new branch (with both commits) to that fork (FR3.3).
   - [ ] 3.9 Create Pull Request:
@@ -79,7 +78,7 @@
     - [ ] 3.9.2 If `gh` is not available or PR creation fails, provide clear instructions for the user to create the PR manually, including the branch name pushed to their fork (FR3.4, TC2).
   - [ ] 3.10 Add verbose error handling for all git operations, GitHub CLI commands, version parsing, and user input throughout the `suggest-changes` process. If critical steps fail (e.g., push, PR creation), advise user appropriately (FR3.4, FR4.2).
   - [ ] 3.11 Add informative status messages for the user throughout the `suggest-changes` process.
-  - [ ] 3.12 Implement cleanup of the temporary clone directory (`CLONE_DIR`) upon exit or interruption.
+  - [ ] 3.12 Implement cleanup of the temporary directory (`TEMP_DIR`) used for cloning, upon exit or interruption (ensure this reuses or is compatible with the existing `cleanup_temp_dir` function and `TEMP_DIR` variable).
 
 - [ ] 4.0 Implement shared CLI infrastructure (FR4)
   - [ ] 4.1 Refine `bin/forge.sh` to robustly handle subcommand dispatching (current single-file structure is acceptable for now, but consider future refactor to separate script files or functions if complexity grows).
