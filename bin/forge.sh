@@ -36,6 +36,52 @@ log_error() {
     exit 1
 }
 
+# Function to check if git is installed
+check_git_installed() {
+    if ! command -v git &> /dev/null; then
+        log_error "git is not installed. Please install git to continue."
+    fi
+}
+
+# --- Init Command Functions ---
+TEMP_DIR="" # Global for cleanup trap
+
+cleanup_temp_dir() {
+    if [ -n "$TEMP_DIR" ] && [ -d "$TEMP_DIR" ]; then
+        log_info "Cleaning up temporary directory: $TEMP_DIR"
+        rm -rf "$TEMP_DIR"
+    fi
+}
+
+# Function to handle the init command logic
+run_init() {
+    check_git_installed
+    TEMP_DIR=$(mktemp -d)
+    # Ensure TEMP_DIR is set for the trap, even if mktemp fails (though set -e handles mktemp failure)
+    if [ -z "$TEMP_DIR" ]; then
+        log_error "Failed to create temporary directory."
+    fi
+    trap cleanup_temp_dir EXIT INT TERM
+
+    log_info "Fetching required files from $AI_FORGE_REPO_URL into $TEMP_DIR..."
+
+    # Paths to fetch from the repository
+    local paths_to_fetch="$CODEX_DIR lore/README.md saga/README.md"
+
+    if git archive --remote="$AI_FORGE_REPO_URL" HEAD $paths_to_fetch | tar -x -C "$TEMP_DIR"; then
+        log_info "Successfully fetched files:"
+        # List fetched top-level items in TEMP_DIR for confirmation
+        ls "$TEMP_DIR"
+    else
+        log_error "Failed to fetch files from repository. Check URL and repository contents."
+        # trap will ensure cleanup_temp_dir is called
+    fi
+
+    # Subsequent tasks (1.4-1.8) will handle copying from $TEMP_DIR to the current directory.
+    # For now, this task is complete once files are fetched.
+    log_info "Files are ready in temporary directory for processing."
+}
+
 # --- Main Command Dispatch ---
 
 # Check if any command is provided
@@ -48,10 +94,7 @@ shift # Remove command from arguments, rest are options for the command
 
 case "$COMMAND" in
     init)
-        log_info "Executing 'init' command..."
-        # Placeholder for init command logic
-        # Source: saga/tasks-prd-ai-forge-cli-tool.md - Task 1.0
-        echo "forge init command - To be implemented"
+        run_init "$@" # Pass any further arguments if init were to accept them
         ;;
     update)
         log_info "Executing 'update' command..."
