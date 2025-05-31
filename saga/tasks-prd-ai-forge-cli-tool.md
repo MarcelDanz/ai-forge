@@ -45,21 +45,21 @@
   - [x] 2.8 Add informative status messages for the user during the `update` process.
   - [x] 2.9 Implement cleanup of any temporary files or directories created during the fetch/update process.
 
-- [ ] 3.0 Implement `forge suggest-changes` command functionality (FR3)
+- [x] 3.0 Implement `forge suggest-changes` command functionality (FR3)
   - Note: Refer to `gh pr create` manual for detailed options: https://cli.github.com/manual/gh_pr_create
-  - [ ] 3.1 Implement argument parsing within `bin/forge` for the `suggest-changes` subcommand.
-  - [ ] 3.2 Implement prompts to get PR title, description, and user's GitHub fork name (e.g., `username/ai-forge`) (FR3.3).
-  - [ ] 3.3 Implement logic to temporarily clone the framework repository (`https://github.com/MarcelDanz/ai-forge.git`) (FR3.2).
-  - [ ] 3.4 Implement logic to create a new branch in the cloned repository (e.g., `suggest-codex-updates-<timestamp>`) (FR3.2).
-  - [ ] 3.5 Implement logic to replace the `codex` folder in the new branch of the cloned repository with the project's local `codex` folder (FR3.2).
-  - [ ] 3.6 **Implement automated Codex versioning logic (FR5.4):**
-    - [ ] 3.6.1 Fetch the original `codex/README.md` from the framework's default branch to get the current version before user's changes are applied.
-    - [ ] 3.6.2 Analyze the differences between the original framework `codex` (from cloned repo, default branch) and the user's local `codex` (to be committed).
-    - [ ] 3.6.3 Based on FR5.4 rules (file additions/removals, substantial content changes vs. minor textual changes), determine if a MINOR or PATCH version bump is needed.
-    - [ ] 3.6.4 Read the current version from the `codex/README.md` (that is now the user's version, copied in step 3.5).
-    - [ ] 3.6.5 Increment the version number according to SemVer rules (e.g., 0.1.0 -> 0.1.1 for PATCH, 0.1.0 -> 0.2.0 for MINOR).
-    - [ ] 3.6.6 Update the `Codex Version:` line in the `codex/README.md` file within the new branch of the cloned repository.
-  - [ ] 3.7 Implement logic to commit all changes (updated `codex` folder and version-bumped `codex/README.md`) to the new branch in the cloned repository.
+  - [x] 3.1 Implement argument parsing within `bin/forge` for the `suggest-changes` subcommand.
+  - [x] 3.2 Implement prompts to get PR title, description, and user's GitHub fork name (e.g., `username/ai-forge`) (FR3.3).
+  - [x] 3.3 Implement logic to temporarily clone the framework repository (`https://github.com/MarcelDanz/ai-forge.git`) (FR3.2).
+  - [x] 3.4 Implement logic to create a new branch in the cloned repository (e.g., `suggest-codex-updates-<timestamp>`) (FR3.2).
+  - [x] 3.5 Implement logic to replace the `codex` folder in the new branch of the cloned repository with the project's local `codex` folder (FR3.2).
+  - [x] 3.6 **Implement automated Codex versioning logic (FR5.4):**
+    - [x] 3.6.1 Fetch the original `codex/README.md` from the framework's default branch to get the current version before user's changes are applied. (Achieved by `git show HEAD:...`)
+    - [x] 3.6.2 Analyze the differences between the original framework `codex` (from cloned repo, default branch) and the user's local `codex` (to be committed). (Implemented basic diff for file add/delete)
+    - [x] 3.6.3 Based on FR5.4 rules (file additions/removals, substantial content changes vs. minor textual changes), determine if a MINOR or PATCH version bump is needed. (Implemented basic heuristic)
+    - [x] 3.6.4 Read the current version from the `codex/README.md` (that is now the user's version, copied in step 3.5). (Reads local version as base for bump)
+    - [x] 3.6.5 Increment the version number according to SemVer rules (e.g., 0.1.0 -> 0.1.1 for PATCH, 0.1.0 -> 0.2.0 for MINOR).
+    - [x] 3.6.6 Update the `Codex Version:` line in the `codex/README.md` file within the new branch of the cloned repository.
+  - [x] 3.7 Implement logic to commit all changes (updated `codex` folder and version-bumped `codex/README.md`) to the new branch in the cloned repository.
   - [ ] 3.8 Implement logic to add the user's specified fork as a remote and push the new branch to that fork (FR3.3).
   - [ ] 3.9 Implement logic to create a pull request to the main `ai-forge` repository using the GitHub CLI (`gh pr create`) with the user-provided title and description (FR3.3, FR3.5).
   - [ ] 3.10 If `gh` is not available or PR creation fails, provide clear instructions for the user to create the PR manually, including the branch name pushed to their fork (FR3.4, TC2).

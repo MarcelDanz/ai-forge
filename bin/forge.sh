@@ -206,6 +206,200 @@ run_update() {
     log_info "Forge update process completed successfully."
 }
 
+# --- Suggest Changes Command Functions ---
+CLONE_DIR="" # Global for suggest_changes clone cleanup trap
+
+cleanup_clone_dir() {
+    if [ -n "$CLONE_DIR" ] && [ -d "$CLONE_DIR" ]; then
+        log_info "Cleaning up clone directory: $CLONE_DIR"
+        # Potentially dangerous if CLONE_DIR is not set correctly, add extra check
+        if [[ "$CLONE_DIR" == /tmp/* || "$CLONE_DIR" == /var/tmp/* ]]; then # Basic safety
+             rm -rf "$CLONE_DIR"
+        else
+            log_error "Clone directory path '$CLONE_DIR' seems unsafe for automatic rm -rf. Please manually clean it."
+        fi
+    fi
+}
+
+check_gh_installed() {
+    if ! command -v gh &> /dev/null; then
+        log_info "GitHub CLI 'gh' is not installed. Some operations like automatic PR creation will be affected."
+        log_info "Please install gh from https://cli.github.com/ for the best experience."
+        return 1 # Indicates gh is not installed
+    fi
+    return 0 # Indicates gh is installed
+}
+
+# Function to handle the suggest-changes command logic
+run_suggest_changes() {
+    check_git_installed
+    # No need to check gh here, will check when attempting to use it.
+
+    # Task 3.2: Prompts for PR info
+    local pr_title pr_body pr_fork_name pr_branch_name
+
+    log_info "Collecting information for the Pull Request..."
+    read -r -p "Enter Pull Request title: " pr_title
+    if [ -z "$pr_title" ]; then
+        log_error "Pull Request title cannot be empty."
+    fi
+
+    log_info "Enter Pull Request body (Ctrl+D on a new line to finish):"
+    pr_body=$(cat) # Read multiline input
+    if [ -z "$pr_body" ]; then
+        log_error "Pull Request body cannot be empty."
+    fi
+    
+    read -r -p "Enter your GitHub fork name (e.g., username/ai-forge): " pr_fork_name
+    if [ -z "$pr_fork_name" ]; then
+        log_error "GitHub fork name cannot be empty."
+    fi
+
+    # Task 3.3: Temporarily clone the framework repository
+    CLONE_DIR=$(mktemp -d)
+    if [ -z "$CLONE_DIR" ]; then
+        log_error "Failed to create temporary directory for cloning."
+    fi
+    trap cleanup_clone_dir EXIT INT TERM # Set trap for this function's clone directory
+
+    log_info "Cloning $AI_FORGE_REPO_URL into $CLONE_DIR..."
+    if ! git clone --depth=1 "$AI_FORGE_REPO_URL" "$CLONE_DIR"; then
+        log_error "Failed to clone repository from $AI_FORGE_REPO_URL."
+    fi
+    
+    # Task 3.4: Create a new branch
+    pr_branch_name="suggest-codex-updates-$(date +%s)"
+    log_info "Creating new branch '$pr_branch_name' in cloned repository..."
+    (cd "$CLONE_DIR" && git checkout -b "$pr_branch_name") || log_error "Failed to create branch '$pr_branch_name'."
+
+    # Task 3.5: Replace codex folder
+    if [ ! -d "./$CODEX_DIR" ]; then
+        log_error "Local './$CODEX_DIR' directory not found. Nothing to suggest."
+    fi
+    log_info "Replacing '$CODEX_DIR' in cloned repository with local version..."
+    rm -rf "$CLONE_DIR/$CODEX_DIR"
+    cp -R "./$CODEX_DIR" "$CLONE_DIR/$CODEX_DIR"
+    log_info "'$CODEX_DIR' in clone updated."
+
+    # Task 3.6: Automated Codex versioning logic
+    log_info "Starting automated Codex versioning..."
+    
+    # 3.6.1: Get original codex version from framework's default branch (HEAD of clone)
+    local original_codex_readme_path="$CLONE_DIR/$CODEX_DIR/README.md.original_head"
+    local current_codex_readme_path_in_clone="$CLONE_DIR/$CODEX_DIR/README.md"
+    
+    # Save the state of codex/README.md from HEAD before it's overwritten by local changes
+    # This is tricky because we already copied the local codex.
+    # Let's adjust: clone, get original readme, then copy local codex.
+    # This requires reordering. For now, let's assume we need to get it from remote again, or adjust flow.
+    # Simpler: Assume the version in the *local* codex/README.md is the one to be bumped,
+    # but the diff is against the framework's HEAD.
+    # The PRD (FR5.4) says "update the Codex Version in the codex/README.md file within the new branch".
+    # This means the user's codex/README.md (already copied) is the one to modify.
+    # We need the framework's version to compare against for diff, not necessarily for bumping.
+    # Let's fetch the framework's HEAD version of codex/README.md for its version number.
+    
+    local framework_readme_content
+    framework_readme_content=$( (cd "$CLONE_DIR" && git show HEAD:"$CODEX_DIR/README.md") 2>/dev/null ) || \
+        log_error "Failed to get framework's $CODEX_DIR/README.md from HEAD."
+
+    local framework_version
+    framework_version=$(echo "$framework_readme_content" | grep "Codex Version:" | awk '{print $3}')
+    if [ -z "$framework_version" ]; then
+        log_error "Could not parse Codex Version from framework's $CODEX_DIR/README.md."
+    fi
+    log_info "Framework Codex version: $framework_version"
+
+    local local_readme_content
+    local_readme_content=$(cat "./$CODEX_DIR/README.md") || \
+        log_error "Failed to read local $CODEX_DIR/README.md"
+    
+    local local_version
+    local_version=$(echo "$local_readme_content" | grep "Codex Version:" | awk '{print $3}')
+    if [ -z "$local_version" ]; then
+        log_error "Could not parse Codex Version from local $CODEX_DIR/README.md."
+    fi
+    log_info "Local Codex version (to be bumped): $local_version"
+
+    # 3.6.2: Analyze differences
+    # We need to diff the original framework codex (still in CLONE_DIR at HEAD before local copy)
+    # with the local codex (in current directory ./$CODEX_DIR).
+    # This is tricky because CLONE_DIR/$CODEX_DIR is now the local one.
+    # Solution: Create a temporary clone of the original codex from CLONE_DIR (HEAD) before overwriting.
+    local original_framework_codex_temp_dir
+    original_framework_codex_temp_dir=$(mktemp -d)
+    
+    log_info "Temporarily extracting framework's HEAD version of $CODEX_DIR for diff analysis..."
+    (cd "$CLONE_DIR" && git archive HEAD "$CODEX_DIR" | tar -x -C "$original_framework_codex_temp_dir") || \
+        log_error "Failed to archive framework's HEAD $CODEX_DIR for diff."
+
+    local diff_output_name_status
+    diff_output_name_status=$(diff -qr --no-dereference "$original_framework_codex_temp_dir/$CODEX_DIR" "./$CODEX_DIR" | sed "s#^Files $original_framework_codex_temp_dir/$CODEX_DIR/##" | sed "s# and ./$CODEX_DIR/##" | sed "s# differ# M#g" | sed "s#Only in ./$CODEX_DIR: # A #g" | sed "s#Only in $original_framework_codex_temp_dir/$CODEX_DIR: # D #g")
+    # This diff is a bit crude for name-status, git diff would be better if we had two git trees.
+    # A simpler heuristic: if the user's local codex is very different from framework's HEAD.
+    # For now, let's use a simpler diff for line counts.
+    
+    local files_added_deleted=0
+    if echo "$diff_output_name_status" | grep -q " A "; then files_added_deleted=1; fi
+    if echo "$diff_output_name_status" | grep -q " D "; then files_added_deleted=1; fi
+
+    # Count changed lines (approximate with wc -l on diff output)
+    # This is not ideal, `git diff --numstat` is better.
+    # Since we have two plain directories, a recursive diff and line count is an option.
+    local lines_changed=0
+    # Using `diff -u` and `wc -l` is a common way.
+    # `diff -Naur old new | grep -E "^\+" | grep -Ev "^\+\+\+" | wc -l` for added lines
+    # `diff -Naur old new | grep -E "^-" | grep -Ev "^---" | wc -l` for removed lines
+    # This is getting complex. Let's simplify the heuristic for now.
+    # Heuristic: Any file added/deleted = MINOR. Else, PATCH.
+    # FR5.4: "Addition or removal of entire files" OR "substantial sections, multiple rules, or entire workflows" -> MINOR
+    # "Corrections to a few words or typo fixes" OR "Minor clarifications" -> PATCH
+
+    local bump_type="PATCH" # Default to PATCH
+    if [ "$files_added_deleted" -eq 1 ]; then
+        bump_type="MINOR"
+        log_info "Files added or deleted in Codex. Determining MINOR bump."
+    else
+        # If no files added/deleted, check for substantial changes.
+        # This is hard to quantify perfectly in shell.
+        # Let's assume if more than N lines changed in total across all files, it's MINOR.
+        # For now, a simpler rule: if not add/delete, it's PATCH.
+        # This can be refined later if needed.
+        log_info "No files added or deleted. Determining PATCH bump (can be refined for 'substantial changes')."
+    fi
+    rm -rf "$original_framework_codex_temp_dir" # Clean up temp dir for original codex
+
+    # 3.6.5 & 3.6.4: Increment version (using local_version as base)
+    local major minor patch
+    IFS='.' read -r major minor patch <<< "$local_version"
+
+    if [ "$bump_type" == "MINOR" ]; then
+        minor=$((minor + 1))
+        patch=0
+    else # PATCH
+        patch=$((patch + 1))
+    fi
+    local new_version="$major.$minor.$patch"
+    log_info "Determined version bump: $local_version -> $new_version ($bump_type)"
+
+    # 3.6.6: Update Codex Version in the cloned (and now local-content) codex/README.md
+    local readme_to_update="$CLONE_DIR/$CODEX_DIR/README.md"
+    if [ ! -f "$readme_to_update" ]; then
+        log_error "$readme_to_update not found. Cannot update version."
+    fi
+    # Using a temporary file for sed robustness
+    local temp_readme
+    temp_readme=$(mktemp)
+    sed "s/Codex Version: $local_version/Codex Version: $new_version/" "$readme_to_update" > "$temp_readme" && mv "$temp_readme" "$readme_to_update"
+    log_info "Updated Codex Version in $readme_to_update to $new_version."
+
+    # Placeholder for further steps (3.7 onwards)
+    log_info "Suggest changes: Initial setup complete. PR Title: '$pr_title', Fork: '$pr_fork_name', Branch: '$pr_branch_name'."
+    
+    # For now, just a placeholder
+    echo "Forge suggest-changes command - Further implementation needed."
+}
+
 
 # --- Main Command Dispatch ---
 
@@ -225,10 +419,7 @@ case "$COMMAND" in
         run_update "$@" # Pass any further arguments if update were to accept them
         ;;
     suggest-changes)
-        log_info "Executing 'suggest-changes' command..."
-        # Placeholder for suggest-changes command logic
-        # Source: saga/tasks-prd-ai-forge-cli-tool.md - Task 3.0
-        echo "forge suggest-changes command - To be implemented"
+        run_suggest_changes "$@"
         ;;
     help)
         if [ -n "$1" ]; then
