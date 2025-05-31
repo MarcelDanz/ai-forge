@@ -152,12 +152,7 @@ run_update() {
     if [ -z "$TEMP_DIR" ]; then
         log_error "Failed to create temporary directory for update."
     fi
-    # trap cleanup_temp_dir EXIT INT TERM is already set by run_init or will be set if update is called first
-    # To be safe, ensure trap is set if this function could be called independently
-    # However, given current structure, TEMP_DIR is global and trap is set once.
-    # If run_init wasn't called, TEMP_DIR might not be cleaned.
-    # Let's ensure the trap is active for this function's scope too.
-    # A single global TEMP_DIR and a single trap is fine.
+    trap cleanup_temp_dir EXIT INT TERM # Ensure trap is set for this function's scope
 
     log_info "Fetching latest '$CODEX_DIR' from $AI_FORGE_REPO_URL into $TEMP_DIR..."
 
