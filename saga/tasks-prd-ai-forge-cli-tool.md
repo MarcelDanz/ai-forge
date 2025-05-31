@@ -43,8 +43,10 @@
   - [ ] 2.6 Ensure the `codex/README.md` in the project's updated `codex` folder correctly reflects the fetched version number (FR2.4).
   - [ ] 2.7 Add verbose error handling for git operations, file system operations, and user input (FR4.2).
   - [ ] 2.8 Add informative status messages for the user during the `update` process.
+  - [ ] 2.9 Implement cleanup of any temporary files or directories created during the fetch/update process.
 
 - [ ] 3.0 Implement `forge suggest-changes` command functionality (FR3)
+  - Note: Refer to `gh pr create` manual for detailed options: https://cli.github.com/manual/gh_pr_create
   - [ ] 3.1 Implement argument parsing within `bin/forge` for the `suggest-changes` subcommand.
   - [ ] 3.2 Implement prompts to get PR title, description, and user's GitHub fork name (e.g., `username/ai-forge`) (FR3.3).
   - [ ] 3.3 Implement logic to temporarily clone the framework repository (`https://github.com/MarcelDanz/ai-forge.git`) (FR3.2).
