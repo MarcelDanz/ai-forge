@@ -223,6 +223,22 @@ run_suggest_changes() {
     read -r -p "Enter the title for your Pull Request: " pr_title
     log_info "PR Title entered: '$pr_title'"
 
+    local pr_body_lines=()
+    local line
+    log_info "Enter the body for your Pull Request (leave an empty line to finish):"
+    while IFS= read -r line; do
+        if [ -z "$line" ]; then
+            break
+        fi
+        pr_body_lines+=("$line")
+    done
+    local pr_body
+    # Join array elements with newline
+    printf -v pr_body '%s\n' "${pr_body_lines[@]}"
+    # Remove trailing newline if present from printf
+    pr_body="${pr_body%\\n}"
+    log_info "PR Body entered." # Not logging the body itself to keep logs concise
+
     # Further implementation will follow in subsequent tasks.
 }
 

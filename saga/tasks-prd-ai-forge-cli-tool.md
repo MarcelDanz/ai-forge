@@ -51,7 +51,7 @@
   - [x] 3.1 Implement argument parsing within `bin/forge.sh` for the `suggest-changes` subcommand.
   - [ ] 3.2 Implement prompts for PR information:
     - [x] 3.2.1 Prompt for PR title.
-    - [ ] 3.2.2 Prompt for PR body (multiline).
+    - [x] 3.2.2 Prompt for PR body (multiline).
     - [ ] 3.2.3 Prompt for user's GitHub fork name (e.g., `username/ai-forge`).
     - [ ] 3.2.4 Implement re-prompting loop for title, body, and fork name if initial input is invalid (empty or incorrect format).
     - [ ] 3.2.5 Implement validation for GitHub fork name format (e.g., `owner/repo`, checking for valid characters).
