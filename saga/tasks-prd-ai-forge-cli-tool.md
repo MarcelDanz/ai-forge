@@ -22,17 +22,17 @@
 
 ## Tasks
 
-- [ ] 1.0 Implement `forge init` command functionality (FR1)
+- [x] 1.0 Implement `forge init` command functionality (FR1)
   - [x] 1.1 Create the main `bin/forge` script file with basic structure for subcommand dispatch.
   - [x] 1.2 Implement argument parsing within `bin/forge` to recognize the `init` subcommand and its options.
   - [x] 1.3 Implement logic to fetch/clone only the required `codex` folder, `lore/README.md`, and `saga/README.md` from `https://github.com/MarcelDanz/ai-forge.git` (FR1.1). (Consider `git archive` or sparse checkout).
   - [x] 1.4 Implement logic to copy the fetched `codex` folder to the current project directory, overwriting if it exists (FR1.3).
   - [x] 1.5 Implement logic to create the `lore` directory in the current project if it doesn't exist (FR1.2, FR1.4).
-  - [ ] 1.6 Implement logic to copy the fetched `lore/README.md` into the project's `lore` directory, only if `lore/README.md` doesn't already exist (FR1.2, FR1.5).
-  - [ ] 1.7 Implement logic to create the `saga` directory in the current project if it doesn't exist (FR1.2, FR1.4).
-  - [ ] 1.8 Implement logic to copy the fetched `saga/README.md` into the project's `saga` directory, only if `saga/README.md` doesn't already exist (FR1.2, FR1.5).
-  - [ ] 1.9 Add verbose error handling for git operations, file system operations, and network issues (FR4.2).
-  - [ ] 1.10 Add informative status messages for the user during the `init` process.
+  - [x] 1.6 Implement logic to copy the fetched `lore/README.md` into the project's `lore` directory, only if `lore/README.md` doesn't already exist (FR1.2, FR1.5).
+  - [x] 1.7 Implement logic to create the `saga` directory in the current project if it doesn't exist (FR1.2, FR1.4).
+  - [x] 1.8 Implement logic to copy the fetched `saga/README.md` into the project's `saga` directory, only if `saga/README.md` doesn't already exist (FR1.2, FR1.5).
+  - [x] 1.9 Add verbose error handling for git operations, file system operations, and network issues (FR4.2).
+  - [x] 1.10 Add informative status messages for the user during the `init` process.
 
 - [ ] 2.0 Implement `forge update` command functionality (FR2)
   - [ ] 2.1 Implement argument parsing within `bin/forge` for the `update` subcommand.

@@ -102,7 +102,46 @@ run_init() {
         log_info "'./$LORE_DIR' directory already exists. Skipping creation."
     fi
 
-    log_info "Init process: Fetching and initial codex copy complete."
+    # Task 1.6: Copy lore/README.md
+    local lore_readme_path_temp="$TEMP_DIR/$LORE_DIR/README.md"
+    local lore_readme_path_project="./$LORE_DIR/README.md"
+    if [ -f "$lore_readme_path_temp" ]; then
+        if [ ! -f "$lore_readme_path_project" ]; then
+            log_info "Copying '$LORE_DIR/README.md' to './$LORE_DIR'..."
+            cp "$lore_readme_path_temp" "$lore_readme_path_project"
+            log_info "'$LORE_DIR/README.md' copied successfully."
+        else
+            log_info "'./$LORE_DIR/README.md' already exists. Skipping copy."
+        fi
+    else
+        log_info "No '$LORE_DIR/README.md' found in fetched files. Skipping copy."
+    fi
+
+    # Task 1.7: Create saga directory if it doesn't exist
+    if [ ! -d "./$SAGA_DIR" ]; then
+        log_info "Creating './$SAGA_DIR' directory..."
+        mkdir -p "./$SAGA_DIR"
+        log_info "'./$SAGA_DIR' directory created."
+    else
+        log_info "'./$SAGA_DIR' directory already exists. Skipping creation."
+    fi
+
+    # Task 1.8: Copy saga/README.md
+    local saga_readme_path_temp="$TEMP_DIR/$SAGA_DIR/README.md"
+    local saga_readme_path_project="./$SAGA_DIR/README.md"
+    if [ -f "$saga_readme_path_temp" ]; then
+        if [ ! -f "$saga_readme_path_project" ]; then
+            log_info "Copying '$SAGA_DIR/README.md' to './$SAGA_DIR'..."
+            cp "$saga_readme_path_temp" "$saga_readme_path_project"
+            log_info "'$SAGA_DIR/README.md' copied successfully."
+        else
+            log_info "'./$SAGA_DIR/README.md' already exists. Skipping copy."
+        fi
+    else
+        log_info "No '$SAGA_DIR/README.md' found in fetched files. Skipping copy."
+    fi
+
+    log_info "Forge init process completed successfully."
 }
 
 # --- Main Command Dispatch ---
