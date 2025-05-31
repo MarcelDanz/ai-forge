@@ -78,8 +78,22 @@ run_init() {
     fi
 
     # Subsequent tasks (1.4-1.8) will handle copying from $TEMP_DIR to the current directory.
-    # For now, this task is complete once files are fetched.
-    log_info "Files are ready in temporary directory for processing."
+    
+    # Task 1.4: Copy codex folder
+    if [ -d "$TEMP_DIR/$CODEX_DIR" ]; then
+        log_info "Copying '$CODEX_DIR' folder to current directory..."
+        # Remove existing codex dir first to ensure clean overwrite, then copy.
+        if [ -d "./$CODEX_DIR" ]; then
+            log_info "Removing existing './$CODEX_DIR' before copying."
+            rm -rf "./$CODEX_DIR"
+        fi
+        cp -R "$TEMP_DIR/$CODEX_DIR" "./$CODEX_DIR"
+        log_info "'$CODEX_DIR' folder copied successfully."
+    else
+        log_info "No '$CODEX_DIR' folder found in fetched files. Skipping copy."
+    fi
+
+    log_info "Init process: Fetching and initial codex copy complete."
 }
 
 # --- Main Command Dispatch ---
