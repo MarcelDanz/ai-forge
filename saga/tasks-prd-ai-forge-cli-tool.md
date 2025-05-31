@@ -60,12 +60,12 @@
     - [x] 3.6.5 Increment the version number according to SemVer rules (e.g., 0.1.0 -> 0.1.1 for PATCH, 0.1.0 -> 0.2.0 for MINOR).
     - [x] 3.6.6 Update the `Codex Version:` line in the `codex/README.md` file within the new branch of the cloned repository.
   - [x] 3.7 Implement logic to commit all changes (updated `codex` folder and version-bumped `codex/README.md`) to the new branch in the cloned repository.
-  - [ ] 3.8 Implement logic to add the user's specified fork as a remote and push the new branch to that fork (FR3.3).
-  - [ ] 3.9 Implement logic to create a pull request to the main `ai-forge` repository using the GitHub CLI (`gh pr create`) with the user-provided title and description (FR3.3, FR3.5).
-  - [ ] 3.10 If `gh` is not available or PR creation fails, provide clear instructions for the user to create the PR manually, including the branch name pushed to their fork (FR3.4, TC2).
-  - [ ] 3.11 Add verbose error handling for git operations, GitHub CLI commands, version parsing, and user input. If PR creation fails, advise user to update their local `codex` and resolve conflicts if necessary (FR3.4, FR4.2).
-  - [ ] 3.12 Add informative status messages for the user throughout the `suggest-changes` process.
-  - [ ] 3.13 Implement cleanup of any temporary files or directories created during the clone/branch/PR creation process (e.g., the temporary clone of the framework repository).
+  - [x] 3.8 Implement logic to add the user's specified fork as a remote and push the new branch to that fork (FR3.3).
+  - [x] 3.9 Implement logic to create a pull request to the main `ai-forge` repository using the GitHub CLI (`gh pr create`) with the user-provided title and description (FR3.3, FR3.5).
+  - [x] 3.10 If `gh` is not available or PR creation fails, provide clear instructions for the user to create the PR manually, including the branch name pushed to their fork (FR3.4, TC2).
+  - [x] 3.11 Add verbose error handling for git operations, GitHub CLI commands, version parsing, and user input. If PR creation fails, advise user to update their local `codex` and resolve conflicts if necessary (FR3.4, FR4.2).
+  - [x] 3.12 Add informative status messages for the user throughout the `suggest-changes` process.
+  - [x] 3.13 Implement cleanup of any temporary files or directories created during the clone/branch/PR creation process (e.g., the temporary clone of the framework repository).
 
 - [ ] 4.0 Implement shared CLI infrastructure (FR4)
   - [ ] 4.1 Refine `bin/forge` to robustly handle subcommand dispatching to separate script files or functions.
