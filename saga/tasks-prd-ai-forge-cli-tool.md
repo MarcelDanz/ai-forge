@@ -16,6 +16,8 @@
 
 - Shell scripts should be placed in a `bin` directory.
 - Ensure scripts are executable (e.g., `chmod +x bin/forge.sh`).
+- `TEMP_DIR` is used by `init` and `update` for temporary storage of `git archive` contents.
+- `CLONE_DIR` is used by `suggest-changes` for the temporary `git clone` of the framework repository. These are distinct and serve different commands.
 - Consider using a shell testing framework like `shunit2` or `bats-core` for automated tests.
 - For `forge suggest-changes`, robust testing will require careful mocking of git remote operations or a dedicated test repository.
 - All user-facing messages should be clear and informative, especially error messages.
@@ -45,30 +47,42 @@
   - [x] 2.8 Add informative status messages for the user during the `update` process.
   - [x] 2.9 Implement cleanup of any temporary files or directories created during the fetch/update process.
 
-- [x] 3.0 Implement `forge suggest-changes` command functionality (FR3)
+- [ ] 3.0 Implement `forge suggest-changes` command functionality (FR3) (Note: Tasks below are re-structured based on feedback)
   - Note: Refer to `gh pr create` manual for detailed options: https://cli.github.com/manual/gh_pr_create
-  - [x] 3.1 Implement argument parsing within `bin/forge` for the `suggest-changes` subcommand.
-  - [x] 3.2 Implement prompts to get PR title, description, and user's GitHub fork name (e.g., `username/ai-forge`) (FR3.3).
-  - [x] 3.3 Implement logic to temporarily clone the framework repository (`https://github.com/MarcelDanz/ai-forge.git`) (FR3.2).
-  - [x] 3.4 Implement logic to create a new branch in the cloned repository (e.g., `suggest-codex-updates-<timestamp>`) (FR3.2).
-  - [x] 3.5 Implement logic to replace the `codex` folder in the new branch of the cloned repository with the project's local `codex` folder (FR3.2).
-  - [x] 3.6 **Implement automated Codex versioning logic (FR5.4):**
-    - [x] 3.6.1 Fetch the original `codex/README.md` from the framework's default branch to get the current version before user's changes are applied. (Achieved by `git show HEAD:...`)
-    - [x] 3.6.2 Analyze the differences between the original framework `codex` (from cloned repo, default branch) and the user's local `codex` (to be committed). (Implemented basic diff for file add/delete)
-    - [x] 3.6.3 Based on FR5.4 rules (file additions/removals, substantial content changes vs. minor textual changes), determine if a MINOR or PATCH version bump is needed. (Implemented basic heuristic)
-    - [x] 3.6.4 Read the current version from the `codex/README.md` (that is now the user's version, copied in step 3.5). (Reads local version as base for bump)
-    - [x] 3.6.5 Increment the version number according to SemVer rules (e.g., 0.1.0 -> 0.1.1 for PATCH, 0.1.0 -> 0.2.0 for MINOR).
-    - [x] 3.6.6 Update the `Codex Version:` line in the `codex/README.md` file within the new branch of the cloned repository.
-  - [x] 3.7 Implement logic to commit all changes (updated `codex` folder and version-bumped `codex/README.md`) to the new branch in the cloned repository.
-  - [x] 3.8 Implement logic to add the user's specified fork as a remote and push the new branch to that fork (FR3.3).
-  - [x] 3.9 Implement logic to create a pull request to the main `ai-forge` repository using the GitHub CLI (`gh pr create`) with the user-provided title and description (FR3.3, FR3.5).
-  - [x] 3.10 If `gh` is not available or PR creation fails, provide clear instructions for the user to create the PR manually, including the branch name pushed to their fork (FR3.4, TC2).
-  - [x] 3.11 Add verbose error handling for git operations, GitHub CLI commands, version parsing, and user input. If PR creation fails, advise user to update their local `codex` and resolve conflicts if necessary (FR3.4, FR4.2).
-  - [x] 3.12 Add informative status messages for the user throughout the `suggest-changes` process.
-  - [x] 3.13 Implement cleanup of any temporary files or directories created during the clone/branch/PR creation process (e.g., the temporary clone of the framework repository).
+  - [ ] 3.1 Implement argument parsing within `bin/forge.sh` for the `suggest-changes` subcommand.
+  - [ ] 3.2 Implement prompts for PR information:
+    - [ ] 3.2.1 Prompt for PR title.
+    - [ ] 3.2.2 Prompt for PR body (multiline).
+    - [ ] 3.2.3 Prompt for user's GitHub fork name (e.g., `username/ai-forge`).
+    - [ ] 3.2.4 Implement re-prompting loop for title, body, and fork name if initial input is invalid (empty or incorrect format).
+    - [ ] 3.2.5 Implement validation for GitHub fork name format (e.g., `owner/repo`, checking for valid characters).
+  - [ ] 3.3 Implement logic to temporarily clone the framework repository (`https://github.com/MarcelDanz/ai-forge.git`) into `CLONE_DIR` (FR3.2).
+  - [ ] 3.4 Implement pre-change checks:
+    - [ ] 3.4.1 Fetch framework's `codex/README.md` from its default branch (e.g., `main` or `HEAD` of the clone) to get the current framework Codex version.
+    - [ ] 3.4.2 Read local project's `codex/README.md` to get the local Codex version.
+    - [ ] 3.4.3 Compare local Codex version with framework's version. If local version is older (e.g., 0.1.0 vs 0.2.0), log error instructing user to run `forge update` first, then exit. (Requires SemVer comparison logic).
+    - [ ] 3.4.4 Check if local `./$CODEX_DIR` directory exists. If not, log error "Local './$CODEX_DIR' directory not found. Nothing to suggest." and exit.
+  - [ ] 3.5 Create a new branch in the cloned repository (e.g., `suggest-codex-updates-<timestamp>`) (FR3.2).
+  - [ ] 3.6 Apply and commit local codex changes:
+    - [ ] 3.6.1 Replace the `codex` folder in the new branch of the cloned repository with the project's local `codex` folder.
+    - [ ] 3.6.2 Commit these `codex` changes to the new branch (e.g., "feat(codex): Apply local codex changes").
+  - [ ] 3.7 Determine and apply Codex version bump (FR5.4):
+    - [ ] 3.7.1 Analyze differences between the new branch (with local changes) and the framework's main branch using `git diff` (e.g., `git diff --name-status main..HEAD` or `git diff --shortstat main..HEAD` within `CLONE_DIR`).
+    - [ ] 3.7.2 Based on FR5.4 rules (file additions/removals, substantial content changes vs. minor textual changes), determine if a MINOR or PATCH version bump is needed.
+    - [ ] 3.7.3 Read the current version from `codex/README.md` in the new branch (this is the user's local version before bumping).
+    - [ ] 3.7.4 Increment the version number according to SemVer rules.
+    - [ ] 3.7.5 Update the `Codex Version:` line in the `codex/README.md` file (in the new branch within `CLONE_DIR`).
+    - [ ] 3.7.6 Commit the version bump to the new branch (e.g., "chore(codex): Bump version to X.Y.Z").
+  - [ ] 3.8 Add user's specified fork as a remote and push the new branch (with both commits) to that fork (FR3.3).
+  - [ ] 3.9 Create Pull Request:
+    - [ ] 3.9.1 Attempt to create a pull request to the main `ai-forge` repository using GitHub CLI (`gh pr create`) with the user-provided title and description (FR3.3, FR3.5).
+    - [ ] 3.9.2 If `gh` is not available or PR creation fails, provide clear instructions for the user to create the PR manually, including the branch name pushed to their fork (FR3.4, TC2).
+  - [ ] 3.10 Add verbose error handling for all git operations, GitHub CLI commands, version parsing, and user input throughout the `suggest-changes` process. If critical steps fail (e.g., push, PR creation), advise user appropriately (FR3.4, FR4.2).
+  - [ ] 3.11 Add informative status messages for the user throughout the `suggest-changes` process.
+  - [ ] 3.12 Implement cleanup of the temporary clone directory (`CLONE_DIR`) upon exit or interruption.
 
 - [ ] 4.0 Implement shared CLI infrastructure (FR4)
-  - [ ] 4.1 Refine `bin/forge` to robustly handle subcommand dispatching to separate script files or functions.
+  - [ ] 4.1 Refine `bin/forge.sh` to robustly handle subcommand dispatching (current single-file structure is acceptable for now, but consider future refactor to separate script files or functions if complexity grows).
   - [ ] 4.2 Implement a comprehensive help system:
     - [ ] 4.2.1 `forge --help` or `forge help`: General usage, list of commands.
     - [ ] 4.2.2 `forge <command> --help` or `forge help <command>`: Detailed help for each command (FR4.3).
