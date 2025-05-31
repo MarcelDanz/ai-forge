@@ -266,11 +266,27 @@ run_suggest_changes() {
     local user_fork
     while true; do
         read -r -p "Enter your GitHub fork name (e.g., username/ai-forge): " user_fork
-        if [ -n "$user_fork" ]; then
-            break
-        else
+        if [ -z "$user_fork" ]; then
             log_info "GitHub fork name cannot be empty. Please try again."
+            continue
         fi
+
+        # Validate format: owner/repo
+        if ! [[ "$user_fork" =~ ^[a-zA-Z0-9-]+/[a-zA-Z0-9_.-]+$ ]]; then
+            log_info "Invalid GitHub fork name format. Expected 'owner/repo'."
+            log_info "Owner and repo names can contain alphanumeric characters and hyphens."
+            log_info "Repo names can additionally contain underscores and periods."
+            log_info "Example: 'your-username/ai-forge-fork'. Please try again."
+            continue
+        fi
+        
+        # Further check: ensure owner and repo parts are not empty (covered by regex for non-empty before/after slash)
+        # The regex ^[a-zA-Z0-9-]+/[a-zA-Z0-9_.-]+$ ensures:
+        # 1. Owner part: one or more alphanumeric or hyphen.
+        # 2. Repo part: one or more alphanumeric, underscore, period, or hyphen.
+        # This implicitly checks that neither part is empty and that there's exactly one slash.
+
+        break # Valid format
     done
     log_info "User fork entered: '$user_fork'"
 
