@@ -65,6 +65,7 @@
   - [ ] 3.10 If `gh` is not available or PR creation fails, provide clear instructions for the user to create the PR manually, including the branch name pushed to their fork (FR3.4, TC2).
   - [ ] 3.11 Add verbose error handling for git operations, GitHub CLI commands, version parsing, and user input. If PR creation fails, advise user to update their local `codex` and resolve conflicts if necessary (FR3.4, FR4.2).
   - [ ] 3.12 Add informative status messages for the user throughout the `suggest-changes` process.
+  - [ ] 3.13 Implement cleanup of any temporary files or directories created during the clone/branch/PR creation process (e.g., the temporary clone of the framework repository).
 
 - [ ] 4.0 Implement shared CLI infrastructure (FR4)
   - [ ] 4.1 Refine `bin/forge` to robustly handle subcommand dispatching to separate script files or functions.
