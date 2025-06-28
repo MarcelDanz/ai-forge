@@ -1,7 +1,7 @@
 
 # AI Forge
 
-AI Forge is a framework for standardizing the use of AI coding assistants in software development projects. It provides a `codex` — a set of rules, conventions, and workflows — that ensures consistency and quality when working with AI.
+AI Forge is a simple, language-agnostic framework designed to turn any plain AI coding assistant into a production-ready software developer. It provides a `codex` — a set of rules, conventions, and workflows — that ensures consistency and quality when working with any LLM.
 
 This repository contains the `forge` CLI tool, a simple utility to help you manage the AI Forge components in your own projects.
 
