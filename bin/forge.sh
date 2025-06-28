@@ -502,14 +502,7 @@ run_suggest_changes() {
     log_info "Local '$CODEX_DIR' copied to temporary repository."
 
     # Check if there are any changes to process before continuing.
-    local has_changes=false
-    (
-        cd "$TEMP_DIR" || exit 1
-        if [ -n "$(git status --porcelain)" ]; then
-            has_changes=true
-        fi
-    )
-    if ! $has_changes; then
+    if [ -z "$(cd "$TEMP_DIR" && git status --porcelain)" ]; then
         log_info "No codex changes detected to commit. Your local codex might be identical to the framework's."
         # Exit gracefully since there's nothing to suggest.
         # The trap will clean up the temp directory.
