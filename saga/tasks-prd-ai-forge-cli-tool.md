@@ -62,9 +62,9 @@
     - [x] 3.4.3 Compare local Codex version with framework's version. If local version is older (e.g., 0.1.0 vs 0.2.0), log error instructing user to run `forge update` first, then exit. (Requires SemVer comparison logic).
     - [x] 3.4.4 Check if local `./$CODEX_DIR` directory exists. If not, log error "Local './$CODEX_DIR' directory not found. Nothing to suggest." and exit.
   - [x] 3.5 Create a new branch in the cloned repository (e.g., `suggest-codex-updates-<timestamp>`) (FR3.2).
-  - [ ] 3.6 Apply and commit local codex changes:
-    - [ ] 3.6.1 Replace the `codex` folder in the new branch of the cloned repository with the project's local `codex` folder.
-    - [ ] 3.6.2 Commit these `codex` changes to the new branch (e.g., "feat(codex): Apply local codex changes").
+  - [x] 3.6 Apply and commit local codex changes:
+    - [x] 3.6.1 Replace the `codex` folder in the new branch of the cloned repository with the project's local `codex` folder.
+    - [x] 3.6.2 Commit these `codex` changes to the new branch (e.g., "feat(codex): Apply local codex changes").
   - [ ] 3.7 Determine and apply Codex version bump (FR5.4):
     - [ ] 3.7.1 Analyze differences between the new branch (with local changes) and the framework's main branch using `git diff` (e.g., `git diff --name-status main..HEAD` or `git diff --shortstat main..HEAD` within `TEMP_DIR`).
     - [ ] 3.7.2 Based on FR5.4 rules (file additions/removals, substantial content changes vs. minor textual changes), determine if a MINOR or PATCH version bump is needed.

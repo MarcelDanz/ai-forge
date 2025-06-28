@@ -393,6 +393,31 @@ run_suggest_changes() {
         log_info "Successfully created and switched to branch '$new_branch_name'."
     )
 
+    # --- Apply and commit local codex changes ---
+    log_info "Applying local codex changes to the temporary repository..."
+    
+    # Remove the old codex from the temp repo and copy the new one in
+    rm -rf "$TEMP_DIR/$CODEX_DIR"
+    cp -R "./$CODEX_DIR" "$TEMP_DIR/$CODEX_DIR"
+    log_info "Local '$CODEX_DIR' copied to temporary repository."
+
+    log_info "Committing codex changes..."
+    (
+        cd "$TEMP_DIR" || exit 1
+        # Check if there are any changes to commit.
+        # `git status --porcelain` will be empty if there are no changes.
+        if [ -z "$(git status --porcelain)" ]; then
+            log_info "No codex changes detected to commit. Your local codex might be identical to the framework's."
+            # We already confirmed local version >= framework version.
+            # If versions are equal and there are no changes, we could exit, but for now we'll continue.
+            # This allows for suggesting changes even if the version hasn't been bumped locally.
+        else
+            git add "$CODEX_DIR"
+            git commit -m "feat(codex): Apply local codex changes"
+            log_info "Codex changes committed successfully."
+        fi
+    )
+
     # Further implementation will follow in subsequent tasks.
 }
 
