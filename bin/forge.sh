@@ -493,7 +493,7 @@ run_suggest_changes() {
         log_info "Successfully created and switched to branch '$new_branch_name'."
     )
 
-    # --- Apply and commit local codex changes ---
+    # --- Apply local codex changes, determine version, and commit ---
     log_info "Applying local codex changes to the temporary repository..."
     
     # Remove the old codex from the temp repo and copy the new one in
@@ -501,24 +501,22 @@ run_suggest_changes() {
     cp -R "./$CODEX_DIR" "$TEMP_DIR/$CODEX_DIR"
     log_info "Local '$CODEX_DIR' copied to temporary repository."
 
-    log_info "Committing codex changes..."
+    # Check if there are any changes to process before continuing.
+    local has_changes=false
     (
         cd "$TEMP_DIR" || exit 1
-        # Check if there are any changes to commit.
-        # `git status --porcelain` will be empty if there are no changes.
-        if [ -z "$(git status --porcelain)" ]; then
-            log_info "No codex changes detected to commit. Your local codex might be identical to the framework's."
-            # We already confirmed local version >= framework version.
-            # If versions are equal and there are no changes, we could exit, but for now we'll continue.
-            # This allows for suggesting changes even if the version hasn't been bumped locally.
-        else
-            git add "$CODEX_DIR"
-            git commit -m "feat(codex): Apply local codex changes"
-            log_info "Codex changes committed successfully."
+        if [ -n "$(git status --porcelain)" ]; then
+            has_changes=true
         fi
     )
+    if ! $has_changes; then
+        log_info "No codex changes detected to commit. Your local codex might be identical to the framework's."
+        # Exit gracefully since there's nothing to suggest.
+        # The trap will clean up the temp directory.
+        exit 0
+    fi
 
-    # --- Determine and apply Codex version bump ---
+    # --- Determine and confirm Codex version bump ---
     log_info "Determining required SemVer bump..."
     local bump_type
     bump_type=$(determine_bump_type "$TEMP_DIR")
@@ -529,23 +527,49 @@ run_suggest_changes() {
     current_version=$(get_codex_version "$TEMP_DIR")
     log_info "Current codex version is $current_version."
 
-    # Increment version
-    local new_version
-    new_version=$(bump_semver "$current_version" "$bump_type")
-    log_info "Bumping version to $new_version."
+    # Propose new version and get user confirmation
+    local proposed_version
+    proposed_version=$(bump_semver "$current_version" "$bump_type")
+    
+    local final_version
+    while true; do
+        read -r -p "The suggested new version is '$proposed_version'. Do you agree? [Y/n] " response
+        response=${response:-Y} # Default to Yes
+        if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+            final_version="$proposed_version"
+            log_info "Using suggested version: $final_version"
+            break
+        elif [[ "$response" =~ ^([nN][oO]|[nN])$ ]]; then
+            read -r -p "Please enter the correct version: " user_version
+            if [ -n "$user_version" ]; then
+                # Basic validation for SemVer format
+                if [[ "$user_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                    final_version="$user_version"
+                    log_info "Using user-provided version: $final_version"
+                    break
+                else
+                    log_info "Invalid version format. Please use SemVer format (e.g., 1.2.3)."
+                fi
+            else
+                log_info "Version cannot be empty. Please try again."
+            fi
+        else
+            log_info "Invalid input. Please answer with 'y' (yes) or 'n' (no)."
+        fi
+    done
 
-    # Update the README file in the temp repo
+    # Update the README file in the temp repo with the final version
     local temp_readme_path="$TEMP_DIR/$CODEX_DIR/README.md"
-    update_codex_version_file "$temp_readme_path" "$new_version"
-    log_info "Updated version in '$CODEX_DIR/README.md'."
+    update_codex_version_file "$temp_readme_path" "$final_version"
+    log_info "Updated version in '$CODEX_DIR/README.md' to $final_version."
 
-    # Commit the version bump
-    log_info "Committing version bump..."
+    # --- Commit all changes ---
+    log_info "Committing all codex changes..."
     (
         cd "$TEMP_DIR" || exit 1
-        git add "$CODEX_DIR/README.md"
-        git commit -m "chore(codex): Bump version to $new_version"
-        log_info "Version bump committed successfully."
+        git add "$CODEX_DIR"
+        git commit -m "feat(codex): Apply local changes and bump version to $final_version"
+        log_info "Codex changes committed successfully."
     )
 
     # Further implementation will follow in subsequent tasks.
