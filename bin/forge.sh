@@ -284,6 +284,21 @@ run_suggest_changes() {
     done
     log_info "User fork entered: '$user_fork'"
 
+    check_git_installed
+
+    # TEMP_DIR is global and will be set here for cleanup by the existing trap
+    TEMP_DIR=$(mktemp -d)
+    if [ -z "$TEMP_DIR" ]; then
+        log_error "Failed to create temporary directory."
+    fi
+    trap cleanup_temp_dir EXIT INT TERM # Ensure trap is set for this function's scope
+
+    log_info "Cloning framework repository from $AI_FORGE_REPO_URL into a temporary directory..."
+    if ! git clone --depth=1 "$AI_FORGE_REPO_URL" "$TEMP_DIR"; then
+        log_error "Failed to clone the repository. Please check the URL and your network connection."
+    fi
+    log_info "Repository cloned successfully into $TEMP_DIR"
+
     # Further implementation will follow in subsequent tasks.
 }
 

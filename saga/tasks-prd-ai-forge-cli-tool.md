@@ -55,7 +55,7 @@
     - [x] 3.2.3 Prompt for user's GitHub fork name (e.g., `username/ai-forge`).
     - [x] 3.2.4 Implement re-prompting loop for title, body, and fork name if initial input is invalid (empty or incorrect format).
     - [x] 3.2.5 Implement validation for GitHub fork name format (e.g., `owner/repo`, checking for valid characters).
-  - [ ] 3.3 Implement logic to temporarily clone the framework repository (`https://github.com/MarcelDanz/ai-forge.git`) into `TEMP_DIR` (FR3.2). The `TEMP_DIR` should be created by this step and cleaned up by step 3.12.
+  - [x] 3.3 Implement logic to temporarily clone the framework repository (`https://github.com/MarcelDanz/ai-forge.git`) into `TEMP_DIR` (FR3.2). The `TEMP_DIR` should be created by this step and cleaned up by step 3.12.
   - [ ] 3.4 Implement pre-change checks:
     - [ ] 3.4.1 Fetch framework's `codex/README.md` from its default branch (e.g., `main` or `HEAD` of the clone in `TEMP_DIR`) to get the current framework Codex version.
     - [ ] 3.4.2 Read local project's `codex/README.md` to get the local Codex version.
