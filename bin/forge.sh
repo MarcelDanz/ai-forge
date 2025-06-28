@@ -43,6 +43,55 @@ check_git_installed() {
     fi
 }
 
+# Function to extract Codex version from a README.md file
+# $1: Path to the directory containing codex/README.md (e.g., "." or "$TEMP_DIR")
+get_codex_version() {
+    local dir_path="$1"
+    local readme_path="$dir_path/$CODEX_DIR/README.md"
+    if [ ! -f "$readme_path" ]; then
+        log_error "Codex README not found at '$readme_path'."
+    fi
+    # Use grep and sed to extract the version number
+    local version_line
+    version_line=$(grep "Codex Version:" "$readme_path")
+    if [ -z "$version_line" ]; then
+        log_error "Could not find 'Codex Version:' line in '$readme_path'."
+    fi
+    # sed 's/.*Codex Version: \([0-9.]*\).*/\1/'
+    local version
+    version=$(echo "$version_line" | sed 's/.*Codex Version: //')
+    if [ -z "$version" ]; then
+        log_error "Could not parse version from line: '$version_line'"
+    fi
+    echo "$version"
+}
+
+# Function to compare two SemVer strings (e.g., 1.2.3 vs 1.3.0)
+# Returns exit code:
+#   0 if versions are equal
+#   1 if version1 > version2
+#   2 if version1 < version2
+semver_compare() {
+    local version1="$1"
+    local version2="$2"
+
+    # Using sort -V for version comparison. It handles different lengths correctly.
+    local sorted_versions
+    sorted_versions=$(printf "%s\n%s" "$version1" "$version2" | sort -V)
+    
+    local first_in_sort
+    first_in_sort=$(echo "$sorted_versions" | head -n1)
+
+    if [ "$version1" = "$version2" ]; then
+        return 0 # equal
+    elif [ "$version1" = "$first_in_sort" ]; then
+        return 2 # v1 < v2
+    else
+        return 1 # v1 > v2
+    fi
+}
+
+
 # --- Init Command Functions ---
 TEMP_DIR="" # Global for cleanup trap
 
@@ -298,6 +347,37 @@ run_suggest_changes() {
         log_error "Failed to clone the repository. Please check the URL and your network connection."
     fi
     log_info "Repository cloned successfully into $TEMP_DIR"
+
+    # --- Pre-change checks ---
+    log_info "Performing pre-change checks..."
+
+    # 3.4.4: Check if local ./codex directory exists
+    if [ ! -d "./$CODEX_DIR" ]; then
+        log_error "Local './$CODEX_DIR' directory not found. Nothing to suggest."
+    fi
+    if [ ! -f "./$CODEX_DIR/README.md" ]; then
+        log_error "Local './$CODEX_DIR/README.md' not found. Cannot determine local codex version."
+    fi
+
+    # 3.4.1 & 3.4.2: Get framework and local codex versions
+    local framework_version
+    framework_version=$(get_codex_version "$TEMP_DIR")
+    log_info "Framework codex version: $framework_version"
+
+    local local_version
+    local_version=$(get_codex_version ".")
+    log_info "Local codex version: $local_version"
+
+    # 3.4.3: Compare versions
+    semver_compare "$local_version" "$framework_version"
+    local comparison_result=$?
+
+    if [ $comparison_result -eq 2 ]; then # local_version < framework_version
+        log_error "Your local codex version ($local_version) is older than the framework's version ($framework_version)."
+        log_error "Please run 'forge update' first, resolve any conflicts, and then try again."
+    fi
+
+    log_info "Pre-change checks passed."
 
     # Further implementation will follow in subsequent tasks.
 }
