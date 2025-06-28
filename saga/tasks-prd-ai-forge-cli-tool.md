@@ -90,17 +90,17 @@
   - [x] 4.5 Ensure all scripts use appropriate exit codes to signal success or failure (TC6).
   - [x] 4.6 Apply shell scripting best practices (e.g., `set -e`, `set -u`, `set -o pipefail` where appropriate) (DC2).
 
-- [ ] 5.0 Update main `README.md` with installation and usage instructions
-  - [ ] 5.1 Add a "Prerequisites" section to `README.md` (e.g., `git`, optionally `gh`).
-  - [ ] 5.2 Draft "Installation" section in `README.md`:
-    - [ ] 5.2.1 Explain cloning the `ai-forge` repository.
-    - [ ] 5.2.2 Explain creating a `bin` directory if it doesn't exist and placing the `forge.sh` script there. Suggest creating a symlink for convenience (e.g., `cd bin; ln -s forge.sh forge`) so the command can be called as `forge`.
-    - [ ] 5.2.3 Explain making the `forge.sh` script executable (e.g., `chmod +x bin/forge.sh`).
-    - [ ] 5.2.4 Provide clear instructions on adding the `bin` directory to the system's PATH for common shells (e.g., bash, zsh), including adding the export command to `.bashrc`/`.zshrc`. This allows calling `forge.sh` (or `forge` if symlinked) from any directory.
-  - [ ] 5.3 Draft "Usage" section in `README.md`:
-    - [ ] 5.3.1 Brief overview of the `forge` CLI tool (mentioning it can be called as `forge` if symlinked/aliased or `forge.sh` directly).
-    - [ ] 5.3.2 Example for `forge init`.
-    - [ ] 5.3.3 Example for `forge update`, mentioning the backup prompt.
-    - [ ] 5.3.4 Example for `forge suggest-changes`, mentioning prompts for PR title, description, and fork name.
-    - [ ] 5.3.5 Example for accessing help (`forge --help`, `forge init --help`, etc.).
-  - [ ] 5.4 Review all `README.md` additions for clarity, accuracy, and completeness, targeting a junior developer audience.
+- [x] 5.0 Update main `README.md` with installation and usage instructions
+  - [x] 5.1 Add a "Prerequisites" section to `README.md` (e.g., `git`, optionally `gh`).
+  - [x] 5.2 Draft "Installation" section in `README.md`:
+    - [x] 5.2.1 Explain cloning the `ai-forge` repository.
+    - [x] 5.2.2 Explain creating a `bin` directory if it doesn't exist and placing the `forge.sh` script there. Suggest creating a symlink for convenience (e.g., `cd bin; ln -s forge.sh forge`) so the command can be called as `forge`.
+    - [x] 5.2.3 Explain making the `forge.sh` script executable (e.g., `chmod +x bin/forge.sh`).
+    - [x] 5.2.4 Provide clear instructions on adding the `bin` directory to the system's PATH for common shells (e.g., bash, zsh), including adding the export command to `.bashrc`/`.zshrc`. This allows calling `forge.sh` (or `forge` if symlinked) from any directory.
+  - [x] 5.3 Draft "Usage" section in `README.md`:
+    - [x] 5.3.1 Brief overview of the `forge` CLI tool (mentioning it can be called as `forge` if symlinked/aliased or `forge.sh` directly).
+    - [x] 5.3.2 Example for `forge init`.
+    - [x] 5.3.3 Example for `forge update`, mentioning the backup prompt.
+    - [x] 5.3.4 Example for `forge suggest-changes`, mentioning prompts for PR title, description, and fork name.
+    - [x] 5.3.5 Example for accessing help (`forge --help`, `forge init --help`, etc.).
+  - [x] 5.4 Review all `README.md` additions for clarity, accuracy, and completeness, targeting a junior developer audience.
