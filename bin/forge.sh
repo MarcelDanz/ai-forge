@@ -1,7 +1,12 @@
 #!/bin/bash
 
+# --- Script Setup ---
 # Exit immediately if a command exits with a non-zero status.
 set -e
+# Treat unset variables as an error when substituting.
+set -u
+# The return value of a pipeline is the status of the last command to exit with a non-zero status.
+set -o pipefail
 
 # --- Configuration ---
 # The official AI Forge framework repository
@@ -12,8 +17,8 @@ SAGA_DIR="saga"
 
 # --- Helper Functions ---
 
-# Function to print usage information
-usage() {
+# --- Help Content Functions ---
+help_main() {
     echo "Usage: forge <command> [options]"
     echo ""
     echo "Commands:"
@@ -22,8 +27,60 @@ usage() {
     echo "  suggest-changes Propose changes from the project's codex back to the AI Forge framework."
     echo "  help           Show this help message or help for a specific command."
     echo ""
-    echo "Run 'forge help <command>' for more information on a specific command."
-    exit 1
+    echo "Run 'forge <command> --help' for more information on a specific command."
+}
+
+help_init() {
+    echo "Usage: forge init"
+    echo ""
+    echo "Initializes the current directory with AI Forge components:"
+    echo "  - Fetches and overwrites the '$CODEX_DIR' folder."
+    echo "  - Creates '$LORE_DIR' and '$SAGA_DIR' if they don't exist."
+    echo "  - Copies '$LORE_DIR/README.md' and '$SAGA_DIR/README.md' from the framework,"
+    echo "    without overwriting if they already exist."
+}
+
+help_update() {
+    echo "Usage: forge update"
+    echo ""
+    echo "Updates the project's '$CODEX_DIR' folder from the AI Forge framework."
+    echo "Prompts to back up the existing '$CODEX_DIR' to '$CODEX_DIR.bak'."
+}
+
+help_suggest_changes() {
+    echo "Usage: forge suggest-changes"
+    echo ""
+    echo "Proposes changes from the project's local '$CODEX_DIR' folder to the AI Forge framework."
+    echo "This involves:"
+    echo "  - Prompting for PR title, description, and your GitHub fork name."
+    echo "  - Automatically determining and applying a SemVer bump (PATCH or MINOR) to the Codex version."
+    echo "  - Pushing changes to your fork and attempting to create a Pull Request."
+}
+
+# --- Core Helper Functions ---
+
+# Function to show help for a command and exit.
+# Exits with 0 for success.
+show_help() {
+    local topic="${1:-}"
+    case "$topic" in
+        init)
+            help_init
+            ;;
+        update)
+            help_update
+            ;;
+        suggest-changes)
+            help_suggest_changes
+            ;;
+        ""|help)
+            help_main
+            ;;
+        *)
+            log_error "Unknown help topic: '$topic'"
+            ;;
+    esac
+    exit 0
 }
 
 # Function for logging messages
@@ -632,63 +689,32 @@ run_suggest_changes() {
 # --- Main Command Dispatch ---
 
 # Check if any command is provided
-if [ -z "$1" ]; then
-    usage
+if [ -z "${1:-}" ]; then
+    help_main
+    exit 1
 fi
 
-COMMAND="$1"
+COMMAND="${1:-}"
+
+# Handle `forge <command> --help` which is a common pattern.
+if [ "${2:-}" = "--help" ]; then
+    show_help "$COMMAND"
+fi
+
 shift # Remove command from arguments, rest are options for the command
 
 case "$COMMAND" in
-    init)
-        run_init "$@" # Pass any further arguments if init were to accept them
-        ;;
-    update)
-        run_update "$@" # Pass any further arguments if update were to accept them
-        ;;
-    suggest-changes)
-        run_suggest_changes "$@"
+    init|update|suggest-changes)
+        "run_$COMMAND" "$@"
         ;;
     help)
-        if [ -n "$1" ]; then
-            # Detailed help for a specific command
-            case "$1" in
-                init)
-                    echo "Usage: forge init"
-                    echo ""
-                    echo "Initializes the current directory with AI Forge components:"
-                    echo "  - Fetches and overwrites the '$CODEX_DIR' folder."
-                    echo "  - Creates '$LORE_DIR' and '$SAGA_DIR' if they don't exist."
-                    echo "  - Copies '$LORE_DIR/README.md' and '$SAGA_DIR/README.md' from the framework,"
-                    echo "    without overwriting if they already exist."
-                    ;;
-                update)
-                    echo "Usage: forge update"
-                    echo ""
-                    echo "Updates the project's '$CODEX_DIR' folder from the AI Forge framework."
-                    echo "Prompts to back up the existing '$CODEX_DIR' to '$CODEX_DIR.bak'."
-                    ;;
-                suggest-changes)
-                    echo "Usage: forge suggest-changes"
-                    echo ""
-                    echo "Proposes changes from the project's local '$CODEX_DIR' folder to the AI Forge framework."
-                    echo "This involves:"
-                    echo "  - Prompting for PR title, description, and your GitHub fork name."
-                    echo "  - Automatically determining and applying a SemVer bump (PATCH or MINOR) to the Codex version."
-                    echo "  - Pushing changes to your fork and attempting to create a Pull Request."
-                    ;;
-                *)
-                    echo "Unknown command for help: $1"
-                    usage
-                    ;;
-            esac
-        else
-            usage
-        fi
+        show_help "${1:-}"
+        ;;
+    --help)
+        show_help
         ;;
     *)
-        log_error "Unknown command: $COMMAND"
-        usage
+        log_error "Unknown command: '$COMMAND'"
         ;;
 esac
 

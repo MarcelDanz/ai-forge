@@ -80,15 +80,15 @@
   - [x] 3.11 Add informative status messages for the user throughout the `suggest-changes` process.
   - [x] 3.12 Implement cleanup of the temporary directory (`TEMP_DIR`) used for cloning, upon exit or interruption (ensure this reuses or is compatible with the existing `cleanup_temp_dir` function and `TEMP_DIR` variable).
 
-- [ ] 4.0 Implement shared CLI infrastructure (FR4)
-  - [ ] 4.1 Refine `bin/forge.sh` to robustly handle subcommand dispatching (current single-file structure is acceptable for now, but consider future refactor to separate script files or functions if complexity grows).
-  - [ ] 4.2 Implement a comprehensive help system:
-    - [ ] 4.2.1 `forge --help` or `forge help`: General usage, list of commands.
-    - [ ] 4.2.2 `forge <command> --help` or `forge help <command>`: Detailed help for each command (FR4.3).
-  - [ ] 4.3 Standardize error message formatting (e.g., `ERROR: <message>`) and ensure verbosity (FR4.2).
-  - [ ] 4.4 Create common utility functions (e.g., in `bin/forge-common.sh`) for logging, checking `git` and `gh` dependencies, and other shared logic.
-  - [ ] 4.5 Ensure all scripts use appropriate exit codes to signal success or failure (TC6).
-  - [ ] 4.6 Apply shell scripting best practices (e.g., `set -e`, `set -u`, `set -o pipefail` where appropriate) (DC2).
+- [x] 4.0 Implement shared CLI infrastructure (FR4)
+  - [x] 4.1 Refine `bin/forge.sh` to robustly handle subcommand dispatching (current single-file structure is acceptable for now, but consider future refactor to separate script files or functions if complexity grows).
+  - [x] 4.2 Implement a comprehensive help system:
+    - [x] 4.2.1 `forge --help` or `forge help`: General usage, list of commands.
+    - [x] 4.2.2 `forge <command> --help` or `forge help <command>`: Detailed help for each command (FR4.3).
+  - [x] 4.3 Standardize error message formatting (e.g., `ERROR: <message>`) and ensure verbosity (FR4.2).
+  - [x] 4.4 Create common utility functions (e.g., in `bin/forge-common.sh`) for logging, checking `git` and `gh` dependencies, and other shared logic.
+  - [x] 4.5 Ensure all scripts use appropriate exit codes to signal success or failure (TC6).
+  - [x] 4.6 Apply shell scripting best practices (e.g., `set -e`, `set -u`, `set -o pipefail` where appropriate) (DC2).
 
 - [ ] 5.0 Update main `README.md` with installation and usage instructions
   - [ ] 5.1 Add a "Prerequisites" section to `README.md` (e.g., `git`, optionally `gh`).
