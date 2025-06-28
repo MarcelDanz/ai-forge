@@ -594,7 +594,45 @@ run_suggest_changes() {
         log_info "Branch pushed successfully to your fork."
     )
 
-    # Further implementation will follow in subsequent tasks.
+    # --- Create Pull Request ---
+    log_info "Attempting to create a Pull Request..."
+    
+    if ! command -v gh &> /dev/null; then
+        log_info "GitHub CLI 'gh' is not installed. Cannot create PR automatically."
+        log_info "Please install gh from https://cli.github.com/ for the best experience."
+    else
+        log_info "Using 'gh' to create Pull Request."
+        (
+            cd "$TEMP_DIR" || exit 1
+            # The --repo flag specifies the upstream repository.
+            # gh will automatically use the pushed branch from the fork.
+            gh pr create --repo "$AI_FORGE_REPO_URL" --title "$pr_title" --body "$pr_body"
+        )
+        
+        if [ $? -eq 0 ]; then
+            log_info "Pull Request created successfully!"
+            log_info "Forge suggest-changes process completed."
+            # The trap will handle cleanup on exit.
+            exit 0
+        else
+            log_info "Failed to create Pull Request using 'gh'. This can happen due to missing permissions or other issues."
+            log_info "Falling back to manual instructions."
+        fi
+    fi
+
+    # Manual instructions section
+    log_info "-----------------------------------------------------------------"
+    log_info "MANUAL ACTION REQUIRED: Create Your Pull Request"
+    log_info "-----------------------------------------------------------------"
+    log_info "Please create the Pull Request manually by visiting this URL:"
+    
+    local user_fork_owner
+    user_fork_owner=$(echo "$user_fork" | cut -d/ -f1)
+    local pr_url="https://github.com/MarcelDanz/ai-forge/compare/main...${user_fork_owner}:${new_branch_name}"
+    
+    log_info "$pr_url"
+    log_info "-----------------------------------------------------------------"
+    log_info "Forge suggest-changes process completed."
 }
 
 

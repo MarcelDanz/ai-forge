@@ -46,10 +46,10 @@
   - [x] 2.8 Add informative status messages for the user during the `update` process.
   - [x] 2.9 Implement cleanup of any temporary files or directories created during the fetch/update process.
 
-- [ ] 3.0 Implement `forge suggest-changes` command functionality (FR3) (Note: Tasks below are re-structured based on feedback)
+- [x] 3.0 Implement `forge suggest-changes` command functionality (FR3) (Note: Tasks below are re-structured based on feedback)
   - Note: Refer to `gh pr create` manual for detailed options: https://cli.github.com/manual/gh_pr_create
   - [x] 3.1 Implement argument parsing within `bin/forge.sh` for the `suggest-changes` subcommand.
-  - [ ] 3.2 Implement prompts for PR information:
+  - [x] 3.2 Implement prompts for PR information:
     - [x] 3.2.1 Prompt for PR title.
     - [x] 3.2.2 Prompt for PR body (multiline).
     - [x] 3.2.3 Prompt for user's GitHub fork name (e.g., `username/ai-forge`).
@@ -73,12 +73,12 @@
     - [x] 3.7.5 Update the `Codex Version:` line in the `codex/README.md` file (in the new branch within `TEMP_DIR`).
     - [x] 3.7.6 Commit the version bump to the new branch (e.g., "chore(codex): Bump version to X.Y.Z").
   - [x] 3.8 Add user's specified fork as a remote and push the new branch (with both commits) to that fork (FR3.3).
-  - [ ] 3.9 Create Pull Request:
-    - [ ] 3.9.1 Attempt to create a pull request to the main `ai-forge` repository using GitHub CLI (`gh pr create`) with the user-provided title and description (FR3.3, FR3.5).
-    - [ ] 3.9.2 If `gh` is not available or PR creation fails, provide clear instructions for the user to create the PR manually, including the branch name pushed to their fork (FR3.4, TC2).
-  - [ ] 3.10 Add verbose error handling for all git operations, GitHub CLI commands, version parsing, and user input throughout the `suggest-changes` process. If critical steps fail (e.g., push, PR creation), advise user appropriately (FR3.4, FR4.2).
-  - [ ] 3.11 Add informative status messages for the user throughout the `suggest-changes` process.
-  - [ ] 3.12 Implement cleanup of the temporary directory (`TEMP_DIR`) used for cloning, upon exit or interruption (ensure this reuses or is compatible with the existing `cleanup_temp_dir` function and `TEMP_DIR` variable).
+  - [x] 3.9 Create Pull Request:
+    - [x] 3.9.1 Attempt to create a pull request to the main `ai-forge` repository using GitHub CLI (`gh pr create`) with the user-provided title and description (FR3.3, FR3.5).
+    - [x] 3.9.2 If `gh` is not available or PR creation fails, provide clear instructions for the user to create the PR manually, including the branch name pushed to their fork (FR3.4, TC2).
+  - [x] 3.10 Add verbose error handling for all git operations, GitHub CLI commands, version parsing, and user input throughout the `suggest-changes` process. If critical steps fail (e.g., push, PR creation), advise user appropriately (FR3.4, FR4.2).
+  - [x] 3.11 Add informative status messages for the user throughout the `suggest-changes` process.
+  - [x] 3.12 Implement cleanup of the temporary directory (`TEMP_DIR`) used for cloning, upon exit or interruption (ensure this reuses or is compatible with the existing `cleanup_temp_dir` function and `TEMP_DIR` variable).
 
 - [ ] 4.0 Implement shared CLI infrastructure (FR4)
   - [ ] 4.1 Refine `bin/forge.sh` to robustly handle subcommand dispatching (current single-file structure is acceptable for now, but consider future refactor to separate script files or functions if complexity grows).
