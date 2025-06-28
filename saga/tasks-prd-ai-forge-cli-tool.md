@@ -65,13 +65,13 @@
   - [x] 3.6 Apply and commit local codex changes:
     - [x] 3.6.1 Replace the `codex` folder in the new branch of the cloned repository with the project's local `codex` folder.
     - [x] 3.6.2 Commit these `codex` changes to the new branch (e.g., "feat(codex): Apply local codex changes").
-  - [ ] 3.7 Determine and apply Codex version bump (FR5.4):
-    - [ ] 3.7.1 Analyze differences between the new branch (with local changes) and the framework's main branch using `git diff` (e.g., `git diff --name-status main..HEAD` or `git diff --shortstat main..HEAD` within `TEMP_DIR`).
-    - [ ] 3.7.2 Based on FR5.4 rules (file additions/removals, substantial content changes vs. minor textual changes), determine if a MINOR or PATCH version bump is needed.
-    - [ ] 3.7.3 Read the current version from `codex/README.md` in the new branch (this is the user's local version before bumping).
-    - [ ] 3.7.4 Increment the version number according to SemVer rules.
-    - [ ] 3.7.5 Update the `Codex Version:` line in the `codex/README.md` file (in the new branch within `TEMP_DIR`).
-    - [ ] 3.7.6 Commit the version bump to the new branch (e.g., "chore(codex): Bump version to X.Y.Z").
+  - [x] 3.7 Determine and apply Codex version bump (FR5.4):
+    - [x] 3.7.1 Analyze differences between the new branch (with local changes) and the framework's main branch using `git diff` (e.g., `git diff --name-status main..HEAD` or `git diff --shortstat main..HEAD` within `TEMP_DIR`).
+    - [x] 3.7.2 Based on FR5.4 rules (file additions/removals, substantial content changes vs. minor textual changes), determine if a MINOR or PATCH version bump is needed.
+    - [x] 3.7.3 Read the current version from `codex/README.md` in the new branch (this is the user's local version before bumping).
+    - [x] 3.7.4 Increment the version number according to SemVer rules.
+    - [x] 3.7.5 Update the `Codex Version:` line in the `codex/README.md` file (in the new branch within `TEMP_DIR`).
+    - [x] 3.7.6 Commit the version bump to the new branch (e.g., "chore(codex): Bump version to X.Y.Z").
   - [ ] 3.8 Add user's specified fork as a remote and push the new branch (with both commits) to that fork (FR3.3).
   - [ ] 3.9 Create Pull Request:
     - [ ] 3.9.1 Attempt to create a pull request to the main `ai-forge` repository using GitHub CLI (`gh pr create`) with the user-provided title and description (FR3.3, FR3.5).

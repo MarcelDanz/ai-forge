@@ -91,6 +91,106 @@ semver_compare() {
     fi
 }
 
+# Determines the version bump type (MINOR or PATCH) based on git diff.
+# $1: Path to the temporary git repository
+determine_bump_type() {
+    local temp_repo_path="$1"
+    local diff_stats
+    local file_changes
+
+    (
+        cd "$temp_repo_path" || exit 1
+        # Get summary of file changes (Added, Deleted, Modified) against the main branch
+        file_changes=$(git diff --name-status main..HEAD -- "$CODEX_DIR")
+        # Get summary of line changes
+        diff_stats=$(git diff --shortstat main..HEAD -- "$CODEX_DIR")
+    )
+
+    # FR5.4: MINOR bump for file additions or removals.
+    if echo "$file_changes" | grep -q -E '^[AD]\s'; then
+        echo "MINOR"
+        return
+    fi
+
+    # FR5.4: MINOR for substantial changes, PATCH for minor changes.
+    # Heuristic: Use line count from --shortstat.
+    if [ -z "$diff_stats" ]; then
+        # This can happen if only file modes changed, or if there are no changes.
+        # The no-change case is handled before this, but as a safeguard, default to PATCH.
+        echo "PATCH"
+        return
+    fi
+
+    local insertions
+    insertions=$(echo "$diff_stats" | grep -o '[0-9]* insertion' | awk '{print $1}')
+    local deletions
+    deletions=$(echo "$diff_stats" | grep -o '[0-9]* deletion' | awk '{print $1}')
+    
+    local total_changes=0
+    if [ -n "$insertions" ]; then
+        total_changes=$((total_changes + insertions))
+    fi
+    if [ -n "$deletions" ]; then
+        total_changes=$((total_changes + deletions))
+    fi
+
+    # Threshold for substantial change. Set to 10 lines based on FR5.4 interpretation.
+    if [ "$total_changes" -gt 10 ]; then
+        echo "MINOR"
+    else
+        echo "PATCH"
+    fi
+}
+
+# Increments a SemVer string.
+# $1: Full version string (e.g., 1.2.3)
+# $2: Component to bump ("MINOR" or "PATCH")
+bump_semver() {
+    local version="$1"
+    local component="$2"
+    
+    local major minor patch
+    major=$(echo "$version" | cut -d. -f1)
+    minor=$(echo "$version" | cut -d. -f2)
+    patch=$(echo "$version" | cut -d. -f3)
+
+    case "$component" in
+        MINOR)
+            minor=$((minor + 1))
+            patch=0
+            ;;
+        PATCH)
+            patch=$((patch + 1))
+            ;;
+        *)
+            log_error "Invalid component for semver bump: $component"
+            ;;
+    esac
+    echo "$major.$minor.$patch"
+}
+
+# Updates the Codex Version in the specified README.md file.
+# $1: Path to the codex/README.md file
+# $2: The new version string
+update_codex_version_file() {
+    local readme_path="$1"
+    local new_version="$2"
+
+    if [ ! -f "$readme_path" ]; then
+        log_error "Cannot update version: README file not found at $readme_path"
+    fi
+
+    # Using sed to replace the version line. This approach with a temp file is portable (macOS/Linux).
+    local temp_file
+    temp_file=$(mktemp)
+    sed "s/^\(Codex Version: \).*/\1$new_version/" "$readme_path" > "$temp_file" && mv "$temp_file" "$readme_path"
+    
+    # Check if replacement was successful
+    if ! grep -q "Codex Version: $new_version" "$readme_path"; then
+        log_error "Failed to update version in $readme_path"
+    fi
+}
+
 
 # --- Init Command Functions ---
 TEMP_DIR="" # Global for cleanup trap
@@ -416,6 +516,36 @@ run_suggest_changes() {
             git commit -m "feat(codex): Apply local codex changes"
             log_info "Codex changes committed successfully."
         fi
+    )
+
+    # --- Determine and apply Codex version bump ---
+    log_info "Determining required SemVer bump..."
+    local bump_type
+    bump_type=$(determine_bump_type "$TEMP_DIR")
+    log_info "Change analysis suggests a '$bump_type' version bump."
+
+    # Read current version from the file in the temp repo (which is the user's local version)
+    local current_version
+    current_version=$(get_codex_version "$TEMP_DIR")
+    log_info "Current codex version is $current_version."
+
+    # Increment version
+    local new_version
+    new_version=$(bump_semver "$current_version" "$bump_type")
+    log_info "Bumping version to $new_version."
+
+    # Update the README file in the temp repo
+    local temp_readme_path="$TEMP_DIR/$CODEX_DIR/README.md"
+    update_codex_version_file "$temp_readme_path" "$new_version"
+    log_info "Updated version in '$CODEX_DIR/README.md'."
+
+    # Commit the version bump
+    log_info "Committing version bump..."
+    (
+        cd "$TEMP_DIR" || exit 1
+        git add "$CODEX_DIR/README.md"
+        git commit -m "chore(codex): Bump version to $new_version"
+        log_info "Version bump committed successfully."
     )
 
     # Further implementation will follow in subsequent tasks.
