@@ -72,7 +72,7 @@
     - [x] 3.7.4 Increment the version number according to SemVer rules.
     - [x] 3.7.5 Update the `Codex Version:` line in the `codex/README.md` file (in the new branch within `TEMP_DIR`).
     - [x] 3.7.6 Commit the version bump to the new branch (e.g., "chore(codex): Bump version to X.Y.Z").
-  - [ ] 3.8 Add user's specified fork as a remote and push the new branch (with both commits) to that fork (FR3.3).
+  - [x] 3.8 Add user's specified fork as a remote and push the new branch (with both commits) to that fork (FR3.3).
   - [ ] 3.9 Create Pull Request:
     - [ ] 3.9.1 Attempt to create a pull request to the main `ai-forge` repository using GitHub CLI (`gh pr create`) with the user-provided title and description (FR3.3, FR3.5).
     - [ ] 3.9.2 If `gh` is not available or PR creation fails, provide clear instructions for the user to create the PR manually, including the branch name pushed to their fork (FR3.4, TC2).

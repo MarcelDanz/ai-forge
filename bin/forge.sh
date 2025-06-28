@@ -572,6 +572,28 @@ run_suggest_changes() {
         log_info "Codex changes committed successfully."
     )
 
+    # --- Push changes to user's fork ---
+    log_info "Adding user's fork as a remote..."
+    local fork_url="https://github.com/$user_fork.git"
+    
+    (
+        cd "$TEMP_DIR" || exit 1
+        # This logic handles cases where the script might be re-run after a failure.
+        if git remote | grep -q "^userfork$"; then
+            git remote set-url userfork "$fork_url"
+        else
+            git remote add userfork "$fork_url"
+        fi
+        log_info "Remote 'userfork' configured for $fork_url."
+
+        log_info "Pushing branch '$new_branch_name' to '$user_fork'..."
+        if ! git push -u userfork "$new_branch_name"; then
+            log_error "Failed to push branch to fork. Please check your credentials and repository permissions."
+            log_error "You may need to configure a personal access token for git."
+        fi
+        log_info "Branch pushed successfully to your fork."
+    )
+
     # Further implementation will follow in subsequent tasks.
 }
 
