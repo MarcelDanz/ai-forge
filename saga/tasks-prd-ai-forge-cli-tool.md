@@ -61,7 +61,7 @@
     - [x] 3.4.2 Read local project's `codex/README.md` to get the local Codex version.
     - [x] 3.4.3 Compare local Codex version with framework's version. If local version is older (e.g., 0.1.0 vs 0.2.0), log error instructing user to run `forge update` first, then exit. (Requires SemVer comparison logic).
     - [x] 3.4.4 Check if local `./$CODEX_DIR` directory exists. If not, log error "Local './$CODEX_DIR' directory not found. Nothing to suggest." and exit.
-  - [ ] 3.5 Create a new branch in the cloned repository (e.g., `suggest-codex-updates-<timestamp>`) (FR3.2).
+  - [x] 3.5 Create a new branch in the cloned repository (e.g., `suggest-codex-updates-<timestamp>`) (FR3.2).
   - [ ] 3.6 Apply and commit local codex changes:
     - [ ] 3.6.1 Replace the `codex` folder in the new branch of the cloned repository with the project's local `codex` folder.
     - [ ] 3.6.2 Commit these `codex` changes to the new branch (e.g., "feat(codex): Apply local codex changes").

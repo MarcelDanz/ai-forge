@@ -379,6 +379,20 @@ run_suggest_changes() {
 
     log_info "Pre-change checks passed."
 
+    # --- Create new branch in temp repo ---
+    local timestamp
+    timestamp=$(date +%s)
+    local new_branch_name="suggest-codex-updates-$timestamp"
+    
+    log_info "Creating new branch '$new_branch_name' in the temporary repository..."
+    (
+        cd "$TEMP_DIR" || exit 1
+        if ! git checkout -b "$new_branch_name"; then
+            log_error "Failed to create new branch '$new_branch_name' in $TEMP_DIR."
+        fi
+        log_info "Successfully created and switched to branch '$new_branch_name'."
+    )
+
     # Further implementation will follow in subsequent tasks.
 }
 
