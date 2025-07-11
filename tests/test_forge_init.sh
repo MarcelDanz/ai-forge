@@ -48,12 +48,24 @@ teardown() {
     [ "$(cat saga/README.md)" = "existing saga" ]
 }
 
-@test "init: overwrites existing codex directory" {
+@test "init: overwrites existing codex directory when confirmed" {
     mkdir -p codex
     echo "old codex" > codex/old_file.md
 
-    run "$FORGE_SCRIPT" init
+    run bash -c "echo 'y' | $FORGE_SCRIPT init"
     [ "$status" -eq 0 ]
     [ ! -f "codex/old_file.md" ]
     [ -f "codex/rules.md" ]
+}
+
+@test "init: does not overwrite existing codex if not confirmed" {
+    mkdir -p codex
+    echo "old codex" > codex/old_file.md
+    echo "old rules" > codex/rules.md
+
+    run bash -c "echo 'n' | $FORGE_SCRIPT init"
+    [ "$status" -eq 0 ]
+    [ -f "codex/old_file.md" ]
+    [ "$(cat codex/rules.md)" = "old rules" ]
+    [[ "$output" == *"Overwrite not confirmed. Aborting init."* ]]
 }

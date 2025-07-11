@@ -27,7 +27,7 @@ The goal of the AI Forge CLI tool is to provide a simple, command-line interface
 ### FR1: `forge init` Command
 *   **FR1.1:** The `forge init` command SHALL fetch the `codex` folder, the `lore/README.md` file, and the `saga/README.md` file from the official AI Forge framework repository located at `https://github.com/MarcelDanz/ai-forge.git`.
 *   **FR1.2:** The command SHALL copy the fetched `codex` folder into the current directory. It SHALL create the `lore` and `saga` directories if they do not exist. It SHALL then copy the fetched `lore/README.md` into the `lore` directory and `saga/README.md` into the `saga` directory.
-*   **FR1.3:** If a `codex` folder already exists in the target project directory, it SHALL be overridden by the version from the framework.
+*   **FR1.3:** If a `codex` folder already exists in the target project directory, the user SHALL be prompted for confirmation before it is overridden by the version from the framework.
 *   **FR1.4:** The `lore` and `saga` directories SHALL be created if they do not exist in the target project directory. The `lore/README.md` and `saga/README.md` files from the framework SHALL be copied into their respective directories.
 *   **FR1.5:** If `lore/README.md` or `saga/README.md` files already exist in the target project directory, they SHALL NOT be overwritten. Other contents within existing `lore` or `saga` folders SHALL NOT be modified by this command.
 
@@ -48,7 +48,7 @@ The goal of the AI Forge CLI tool is to provide a simple, command-line interface
 *   **FR4.1:** The CLI tool SHALL be implemented as one or more simple `.sh` (shell script) files.
 *   **FR4.2:** All commands SHALL provide verbose error messages to assist the user in diagnosing and resolving issues.
 *   **FR4.3:** The CLI tool SHALL provide a help mechanism (e.g., `forge --help`, `forge <command> --help`, or a dedicated `forge help <command>`) that explains the purpose, usage, and potential consequences of each command.
-*   **FR4.4:** Commands SHALL generally execute their primary actions without requiring interactive confirmation prompts. However, `forge update` SHALL prompt for backup confirmation, and `forge suggest-changes` SHALL prompt for pull request title, description, and fork information. The help documentation should serve as the primary source of information regarding command consequences for other actions.
+*   **FR4.4:** Commands SHALL generally execute their primary actions without requiring interactive confirmation prompts. However, `forge init` SHALL prompt for overwrite confirmation, `forge update` SHALL prompt for backup confirmation, and `forge suggest-changes` SHALL prompt for pull request title, description, and fork information. The help documentation should serve as the primary source of information regarding command consequences for other actions.
 
 ### FR5: Codex Versioning
 *   **FR5.1:** The `codex` folder within the main AI Forge framework repository MUST contain a `README.md` file.

@@ -286,10 +286,16 @@ run_init() {
     # Copy codex folder
     if [ -d "$TEMP_DIR/$CODEX_DIR" ]; then
         log_info "Copying '$CODEX_DIR' folder to current directory..."
-        # Remove existing codex dir first to ensure clean overwrite, then copy.
         if [ -d "./$CODEX_DIR" ]; then
-            log_info "Removing existing './$CODEX_DIR' before copying."
-            rm -rf "./$CODEX_DIR"
+            read -r -p "A './$CODEX_DIR' directory already exists. Overwrite it? [y/N] " response
+            response=${response:-N} # Default to No
+            if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+                log_info "User confirmed overwrite. Removing existing './$CODEX_DIR'..."
+                rm -rf "./$CODEX_DIR"
+            else
+                log_info "Overwrite not confirmed. Aborting init."
+                exit 0
+            fi
         fi
         cp -R "$TEMP_DIR/$CODEX_DIR" "./$CODEX_DIR"
         log_info "'$CODEX_DIR' folder copied successfully."
