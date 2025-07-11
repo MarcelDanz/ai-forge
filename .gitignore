@@ -54,3 +54,7 @@ Temporary Items
 ### Project Specific ###
 # Backup directory created by 'forge update'
 codex.bak/
+
+### Testing ###
+# BATS testing framework submodule
+tests/bats/

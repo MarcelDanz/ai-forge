@@ -624,7 +624,8 @@ run_suggest_changes() {
 
     # --- Push changes to user's fork ---
     log_info "Adding user's fork as a remote..."
-    local fork_url="https://github.com/$user_fork.git"
+    # Allow override for testing purposes
+    local fork_url="${AI_FORGE_FORK_URL_OVERRIDE:-https://github.com/$user_fork.git}"
     
     (
         cd "$TEMP_DIR" || exit 1
