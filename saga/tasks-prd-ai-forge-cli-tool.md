@@ -10,7 +10,7 @@
 - `tests/test_forge_init.sh`: Unit/integration tests for the `init` command.
 - `tests/test_forge_update.sh`: Unit/integration tests for the `update` command.
 - `tests/test_forge_suggest_changes.sh`: Unit/integration tests for the `suggest-changes` command, including versioning logic.
-- `tests/test_shared_infra.sh`: Tests for shared CLI infrastructure like help and error handling.
+- `tests/test_cli_core.sh`: Tests for shared CLI infrastructure like help and error handling.
 
 ### Notes
 
@@ -107,7 +107,7 @@
 
 - [ ] 6.0 Implement automated tests for the CLI tool
   - [ ] 6.1 Set up a testing framework (e.g., `bats-core` or `shunit2`) and create a test runner script.
-  - [ ] 6.2 Create `tests/test_shared_infra.sh` to test help commands and error handling.
+  - [ ] 6.2 Create `tests/test_cli_core.sh` to test help commands and error handling.
   - [ ] 6.3 Create `tests/test_forge_init.sh` to test the `init` command functionality.
   - [ ] 6.4 Create `tests/test_forge_update.sh` to test the `update` command functionality.
   - [ ] 6.5 Create `tests/test_forge_suggest_changes.sh` to test the `suggest-changes` command functionality.
