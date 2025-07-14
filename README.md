@@ -41,17 +41,15 @@ To use the `forge` CLI tool, you need to make the `bin/forge.sh` script availabl
     ```
     Replace `/path/to/your/ai-forge` with the actual absolute path.
 
-4.  **(Optional) Create a symlink for convenience:**
-    You can create a symbolic link to call the script simply as `forge` instead of `forge.sh`.
+4.  **(Optional) Create a convenient `forge` command:**
+    To use the shorter `forge` command instead of `forge.sh`, you can create a symbolic link. This command, run from the `ai-forge` project root, creates the link inside the `bin` directory:
     ```bash
-    # Inside the bin/ directory:
-    cd bin
-    ln -s forge.sh forge
+    (cd bin && ln -s forge.sh forge)
     ```
 
 ## Usage
 
-The `forge` CLI tool helps you manage AI Forge components in your project.
+The `forge` CLI tool helps you manage AI Forge components in your project. It can be run as `forge.sh`, or simply `forge` if you created the optional symbolic link during installation.
 
 ### `forge init`
 Initializes a new or existing project with the standard AI Forge components (`codex`, `lore`, `saga`).
