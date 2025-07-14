@@ -4,11 +4,9 @@ load 'helpers'
 
 setup() {
     setup_test_dir
-    setup_framework_repo
 }
 
 teardown() {
-    teardown_framework_repo
     teardown_test_dir
 }
 
@@ -28,16 +26,14 @@ teardown() {
     [ -f "codex/workflows/README.md" ]
     [ -f "codex/behaviors/README.md" ]
     [ -f "codex/recipes/README.md" ]
-    [ "$(cat codex/README.md)" = "Codex Version: 0.1.0" ]
+    [[ "$(cat codex/README.md)" == *"Codex Version: 0.1.0"* ]]
 }
 
 @test "init: copies lore/README.md and saga/README.md" {
     run "$FORGE_SCRIPT" init
     [ "$status" -eq 0 ]
     [ -f "lore/README.md" ]
-    [ "$(cat lore/README.md)" = "lore readme" ]
     [ -f "saga/README.md" ]
-    [ "$(cat saga/README.md)" = "saga readme" ]
 }
 
 @test "init: does not overwrite existing lore/README.md or saga/README.md" {
@@ -58,17 +54,18 @@ teardown() {
     run bash -c "echo 'y' | $FORGE_SCRIPT init"
     [ "$status" -eq 0 ]
     [ ! -f "codex/old_file.md" ]
-    [ -f "codex/rules.md" ]
+    [ -f "codex/rules/README.md" ]
 }
 
 @test "init: does not overwrite existing codex if not confirmed" {
     mkdir -p codex
     echo "old codex" > codex/old_file.md
-    echo "old rules" > codex/rules.md
+    mkdir -p codex/rules
+    echo "old rules" > codex/rules/README.md
 
     run bash -c "echo 'n' | $FORGE_SCRIPT init"
     [ "$status" -eq 0 ]
     [ -f "codex/old_file.md" ]
-    [ "$(cat codex/rules.md)" = "old rules" ]
+    [ "$(cat codex/rules/README.md)" = "old rules" ]
     [[ "$output" == *"Overwrite not confirmed. Aborting init."* ]]
 }

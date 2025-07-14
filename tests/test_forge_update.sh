@@ -4,11 +4,9 @@ load 'helpers'
 
 setup() {
     setup_test_dir
-    setup_framework_repo
 }
 
 teardown() {
-    teardown_framework_repo
     teardown_test_dir
 }
 
@@ -16,7 +14,7 @@ teardown() {
     # First, init a project with an old codex
     mkdir -p codex
     echo "Codex Version: 0.0.1" > codex/README.md
-    echo "old rule" > codex/rules.md
+    echo "old rule" > codex/old_file.md
 
     # Now, run update (without backup)
     run bash -c "echo 'N' | $FORGE_SCRIPT update"
@@ -25,12 +23,14 @@ teardown() {
     [ -f "codex/README.md" ]
     [[ "$(cat codex/README.md)" == *"Codex Version: 0.1.0"* ]]
     [ ! -d "codex.bak" ]
+    [ ! -f "codex/old_file.md" ]
+    [ -f "codex/rules/README.md" ]
 }
 
 @test "update: creates a backup when user says yes" {
     mkdir -p codex
     echo "Codex Version: 0.0.1" > codex/README.md
-    echo "old rule" > codex/rules.md
+    echo "old rule" > codex/old_file.md
 
     # Run update and say 'y' to backup
     run bash -c "echo 'y' | $FORGE_SCRIPT update"

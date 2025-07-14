@@ -106,8 +106,8 @@
   - [x] 5.4 Review all `README.md` additions for clarity, accuracy, and completeness, targeting a junior developer audience.
 
 - [ ] 6.0 Refactor `init` and `update` tests to use real APIs and fix failures
-  - [ ] 6.1 Remove mock git repository helpers from `tests/helpers.bash`.
-  - [ ] 6.2 Update `test_forge_init.sh` and `test_forge_update.sh` to work against the live `https://github.com/MarcelDanz/ai-forge.git` repository.
+  - [x] 6.1 Remove mock git repository helpers from `tests/helpers.bash`.
+  - [x] 6.2 Update `test_forge_init.sh` and `test_forge_update.sh` to work against the live `https://github.com/MarcelDanz/ai-forge.git` repository.
   - [ ] 6.3 Ensure `init` and `update` tests pass.
 - [ ] 7.0 Implement tests for `suggest-changes`
   - [ ] 7.1 Create `tests/test_forge_suggest_changes.sh`.
