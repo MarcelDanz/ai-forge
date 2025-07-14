@@ -105,8 +105,12 @@
     - [x] 5.3.5 Example for accessing help (`forge --help`, `forge init --help`, etc.).
   - [x] 5.4 Review all `README.md` additions for clarity, accuracy, and completeness, targeting a junior developer audience.
 
-- [ ] 6.0 Refactor automated tests to use real APIs and fix failures
+- [ ] 6.0 Refactor `init` and `update` tests to use real APIs and fix failures
   - [ ] 6.1 Remove mock git repository helpers from `tests/helpers.bash`.
-  - [ ] 6.2 Remove mock `gh` command helper from `tests/helpers.bash`.
-  - [ ] 6.3 Update test suites (`test_forge_init.sh`, `test_forge_update.sh`, `test_forge_suggest_changes.sh`) to work against the live `https://github.com/MarcelDanz/ai-forge.git` repository.
-  - [ ] 6.5 Ensure all tests pass after refactoring and fixing the commands.
+  - [ ] 6.2 Update `test_forge_init.sh` and `test_forge_update.sh` to work against the live `https://github.com/MarcelDanz/ai-forge.git` repository.
+  - [ ] 6.3 Ensure `init` and `update` tests pass.
+- [ ] 7.0 Implement tests for `suggest-changes`
+  - [ ] 7.1 Create `tests/test_forge_suggest_changes.sh`.
+  - [ ] 7.2 Remove mock `gh` helper from `tests/helpers.bash`.
+  - [ ] 7.3 Update tests to use the real `gh` CLI and a live GitHub fork.
+  - [ ] 7.4 Ensure all `suggest-changes` tests pass.
