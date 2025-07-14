@@ -24,7 +24,10 @@ teardown() {
     run "$FORGE_SCRIPT" init
     [ "$status" -eq 0 ]
     [ -f "codex/README.md" ]
-    [ -f "codex/rules.md" ]
+    [ -f "codex/rules/README.md" ]
+    [ -f "codex/workflows/README.md" ]
+    [ -f "codex/behaviors/README.md" ]
+    [ -f "codex/recipes/README.md" ]
     [ "$(cat codex/README.md)" = "Codex Version: 0.1.0" ]
 }
 
