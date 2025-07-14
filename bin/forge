@@ -500,11 +500,25 @@ run_suggest_changes() {
         log_error "Failed to get GitHub username using 'gh api user'."
     fi
 
-    # Ensure a fork exists. gh repo fork is idempotent and prints the fork's URL.
+    # Ensure a fork exists. We'll ignore the output as it's not reliable for scripting.
     log_info "Ensuring a fork of '$AI_FORGE_REPO_URL' exists for user '$username'..."
-    local fork_url
-    if ! fork_url=$(gh repo fork "$AI_FORGE_REPO_URL" --clone=false --remote=false); then
+    # The >/dev/null suppresses messages like "fork already exists"
+    if ! gh repo fork "$AI_FORGE_REPO_URL" --clone=false --remote=false > /dev/null; then
         log_error "Failed to create or verify your fork. Please check your GitHub CLI permissions and authentication."
+    fi
+
+    # Reliably get the fork's clone URL using the API
+    log_info "Fetching your fork's URL from the GitHub API..."
+    local upstream_owner
+    upstream_owner=$(echo "$AI_FORGE_REPO_URL" | sed -n 's|https://github.com/\(.*\)/.*|\1|p')
+    local upstream_repo
+    upstream_repo=$(basename "$AI_FORGE_REPO_URL" .git)
+    
+    local fork_url
+    fork_url=$(gh api "repos/$upstream_owner/$upstream_repo/forks" --jq ".[] | select(.owner.login==\"$username\") | .clone_url" | head -n 1)
+
+    if [ -z "$fork_url" ]; then
+        log_error "Could not find a fork of '$upstream_repo' under your account ('$username'). Please ensure a fork exists."
     fi
 
     TEMP_DIR=$(mktemp -d)
