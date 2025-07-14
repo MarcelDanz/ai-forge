@@ -38,10 +38,11 @@ teardown() {
     # 2. PR Body (multiline, terminated by an empty line)
     # 3. 'gh' confirmation to fork the repo ('y')
     # 4. 'forge' confirmation for the suggested version bump ('y')
-    # The input is piped to the script.
-    # It contains the PR title, body, a 'y' for the gh fork prompt,
-    # and a final 'y' for the version bump confirmation.
-    printf '%s\n%s\n\n%s\n%s\n' "$pr_title" "$pr_body" "y" "y" | run "$FORGE_SCRIPT" suggest-changes
+    local input
+    printf -v input "%s\n%s\n\n%s\n%s\n" "$pr_title" "$pr_body" "y" "y"
+
+    # Use a "here string" (`<<<`) to provide input, which is more robust than piping to `run`.
+    run "$FORGE_SCRIPT" suggest-changes <<< "$input"
     [ "$status" -eq 0 ]
     
     # Extract the PR URL from the output
