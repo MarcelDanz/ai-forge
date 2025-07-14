@@ -109,5 +109,4 @@
   - [ ] 6.1 Remove mock git repository helpers from `tests/helpers.bash`.
   - [ ] 6.2 Remove mock `gh` command helper from `tests/helpers.bash`.
   - [ ] 6.3 Update test suites (`test_forge_init.sh`, `test_forge_update.sh`, `test_forge_suggest_changes.sh`) to work against the live `https://github.com/MarcelDanz/ai-forge.git` repository.
-  - [ ] 6.4 Fix the logic in `bin/forge.sh` for the `init` and `suggest-changes` commands to resolve underlying test failures.
   - [ ] 6.5 Ensure all tests pass after refactoring and fixing the commands.
