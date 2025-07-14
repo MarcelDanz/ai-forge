@@ -272,7 +272,7 @@ run_init() {
     log_info "Cloning remote repository to fetch files..."
     local CLONE_DIR
     CLONE_DIR=$(mktemp -d -p "$TEMP_DIR")
-    if ! git clone --depth=1 "$AI_FORGE_REPO_URL" "$CLONE_DIR"; then
+    if ! git clone "$AI_FORGE_REPO_URL" "$CLONE_DIR"; then
         log_error "Failed to clone repository from $AI_FORGE_REPO_URL"
     fi
 
@@ -377,7 +377,7 @@ run_update() {
     log_info "Cloning remote repository to fetch files..."
     local CLONE_DIR
     CLONE_DIR=$(mktemp -d -p "$TEMP_DIR")
-    if ! git clone --depth=1 "$AI_FORGE_REPO_URL" "$CLONE_DIR"; then
+    if ! git clone "$AI_FORGE_REPO_URL" "$CLONE_DIR"; then
         log_error "Failed to clone repository from $AI_FORGE_REPO_URL"
     fi
 
@@ -500,7 +500,7 @@ run_suggest_changes() {
     trap cleanup_temp_dir EXIT INT TERM # Ensure trap is set for this function's scope
 
     log_info "Cloning framework repository from $AI_FORGE_REPO_URL into a temporary directory..."
-    if ! git clone --depth=1 "$AI_FORGE_REPO_URL" "$TEMP_DIR"; then
+    if ! git clone "$AI_FORGE_REPO_URL" "$TEMP_DIR"; then
         log_error "Failed to clone the repository. Please check the URL and your network connection."
     fi
     log_info "Repository cloned successfully into $TEMP_DIR"
