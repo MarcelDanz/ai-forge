@@ -269,18 +269,26 @@ run_init() {
     fi
     trap cleanup_temp_dir EXIT INT TERM
 
-    log_info "Fetching required files from $AI_FORGE_REPO_URL into $TEMP_DIR..."
+    log_info "Cloning remote repository to fetch files..."
+    local CLONE_DIR
+    CLONE_DIR=$(mktemp -d -p "$TEMP_DIR")
+    if ! git clone --depth=1 "$AI_FORGE_REPO_URL" "$CLONE_DIR"; then
+        log_error "Failed to clone repository from $AI_FORGE_REPO_URL"
+    fi
+
+    # The files will be archived from the clone into TEMP_DIR.
+    # CLONE_DIR will be cleaned up automatically with TEMP_DIR.
+    log_info "Archiving required files from the local clone..."
 
     # Paths to fetch from the repository
     local paths_to_fetch="$CODEX_DIR lore/README.md saga/README.md"
 
-    if git archive --remote="$AI_FORGE_REPO_URL" HEAD $paths_to_fetch | tar -x -C "$TEMP_DIR"; then
-        log_info "Successfully fetched files:"
+    if (cd "$CLONE_DIR" && git archive HEAD $paths_to_fetch) | tar -x -C "$TEMP_DIR"; then
+        log_info "Successfully fetched files into $TEMP_DIR:"
         # List fetched top-level items in TEMP_DIR for confirmation
         ls "$TEMP_DIR"
     else
-        log_error "Failed to fetch files from repository. Check URL and repository contents."
-        # trap will ensure cleanup_temp_dir is called
+        log_error "Failed to archive files from the cloned repository."
     fi
 
     # Copy codex folder
@@ -366,9 +374,16 @@ run_update() {
     fi
     trap cleanup_temp_dir EXIT INT TERM # Ensure trap is set for this function's scope
 
-    log_info "Fetching latest '$CODEX_DIR' from $AI_FORGE_REPO_URL into $TEMP_DIR..."
+    log_info "Cloning remote repository to fetch files..."
+    local CLONE_DIR
+    CLONE_DIR=$(mktemp -d -p "$TEMP_DIR")
+    if ! git clone --depth=1 "$AI_FORGE_REPO_URL" "$CLONE_DIR"; then
+        log_error "Failed to clone repository from $AI_FORGE_REPO_URL"
+    fi
 
-    if git archive --remote="$AI_FORGE_REPO_URL" HEAD "$CODEX_DIR" | tar -x -C "$TEMP_DIR"; then
+    log_info "Fetching latest '$CODEX_DIR' from the local clone into $TEMP_DIR..."
+
+    if (cd "$CLONE_DIR" && git archive HEAD "$CODEX_DIR") | tar -x -C "$TEMP_DIR"; then
         log_info "Successfully fetched '$CODEX_DIR'."
         if [ -d "$TEMP_DIR/$CODEX_DIR" ]; then
             ls "$TEMP_DIR/$CODEX_DIR" # List contents of fetched codex for confirmation
@@ -376,7 +391,7 @@ run_update() {
             log_error "Fetched archive, but '$CODEX_DIR' not found within it."
         fi
     else
-        log_error "Failed to fetch '$CODEX_DIR' from repository."
+        log_error "Failed to archive files from the cloned repository."
     fi
 
     # Subsequent tasks will handle backup, replacement, version check, and cleanup.

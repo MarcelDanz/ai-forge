@@ -114,7 +114,7 @@
 
   - [ ] 7.0 Debug and Fix Failing Automated Tests
     - [ ] 7.1 Fix failures in `tests/test_forge_init.sh`
-      - [ ] 7.1.1 "init: creates codex, lore, and saga directories"
+      - [x] 7.1.1 "init: creates codex, lore, and saga directories"
       - [ ] 7.1.2 "init: copies codex folder correctly"
       - [ ] 7.1.3 "init: copies lore/README.md and saga/README.md"
       - [ ] 7.1.4 "init: does not overwrite existing lore/README.md or saga/README.md"
