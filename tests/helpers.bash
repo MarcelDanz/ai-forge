@@ -22,26 +22,54 @@ teardown_test_dir() {
 }
 
 
-# Placeholder for PR URL created during a test run
+# Placeholders for test artifacts that need to be cleaned up
 export CREATED_PR_URL_FILE
+export CREATED_FORK_URL_FILE
+export CREATED_BRANCH_NAME_FILE
 
-# Cleans up a pull request created during a test run.
+# Cleans up a pull request and its remote branch created during a test run.
 # This function should be called from the teardown function of a test file.
 teardown_pr() {
-    if [ ! -f "$CREATED_PR_URL_FILE" ]; then
-        return
-    fi
-    local pr_url
-    pr_url=$(cat "$CREATED_PR_URL_FILE")
-    rm -f "$CREATED_PR_URL_FILE"
-    if [ -z "$pr_url" ]; then
-        return
+    # Close PR if one was created
+    if [ -f "$CREATED_PR_URL_FILE" ]; then
+        local pr_url
+        pr_url=$(cat "$CREATED_PR_URL_FILE")
+        rm -f "$CREATED_PR_URL_FILE"
+
+        if [ -n "$pr_url" ]; then
+            echo "INFO: Cleaning up PR: $pr_url"
+            if gh pr view "$pr_url" > /dev/null 2>&1; then
+                gh pr close "$pr_url" --comment "Closed automatically after test run." || echo "WARN: Failed to close PR $pr_url."
+            else
+                echo "WARN: PR $pr_url not found, can't clean up."
+            fi
+        fi
     fi
 
-    echo "INFO: Cleaning up PR: $pr_url"
-    if gh pr view "$pr_url" > /dev/null 2>&1; then
-        gh pr close "$pr_url" --comment "Closed automatically after test run." || echo "WARN: Failed to close PR $pr_url."
-    else
-        echo "WARN: PR $pr_url not found, can't clean up."
+    # Delete the remote branch from the fork
+    if [ -f "$CREATED_FORK_URL_FILE" ] && [ -f "$CREATED_BRANCH_NAME_FILE" ]; then
+        local fork_url
+        fork_url=$(cat "$CREATED_FORK_URL_FILE")
+        rm -f "$CREATED_FORK_URL_FILE"
+
+        local branch_name
+        branch_name=$(cat "$CREATED_BRANCH_NAME_FILE")
+        rm -f "$CREATED_BRANCH_NAME_FILE"
+
+        if [ -n "$fork_url" ] && [ -n "$branch_name" ]; then
+            echo "INFO: Deleting remote branch '$branch_name' from fork..."
+            local fork_owner_repo
+            # Extract owner/repo from URL like https://github.com/owner/repo.git
+            fork_owner_repo=$(echo "$fork_url" | sed -n 's|https://github.com/\(.*\)\.git$|\1|p')
+            if [ -n "$fork_owner_repo" ]; then
+                local ref_path="heads/$branch_name"
+                # Use `gh api` to delete the git ref (the branch)
+                if ! gh api --method DELETE "repos/$fork_owner_repo/git/refs/$ref_path" > /dev/null; then
+                     echo "WARN: Failed to delete remote branch '$branch_name' from fork. It may require manual cleanup."
+                fi
+            else
+                 echo "WARN: Could not parse fork owner/repo from URL '$fork_url'."
+            fi
+        fi
     fi
 }

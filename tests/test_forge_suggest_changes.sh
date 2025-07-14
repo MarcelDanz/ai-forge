@@ -10,8 +10,10 @@ setup() {
         skip "GitHub CLI 'gh' is not authenticated. Skipping live PR test."
     fi
     
-    # The test will write the created PR URL to this file for cleanup
+    # Files to store artifacts for cleanup in teardown
     CREATED_PR_URL_FILE="$BATS_TEST_DIR/created_pr_url.txt"
+    CREATED_FORK_URL_FILE="$BATS_TEST_DIR/created_fork_url.txt"
+    CREATED_BRANCH_NAME_FILE="$BATS_TEST_DIR/created_branch_name.txt"
 }
 
 teardown() {
@@ -63,26 +65,26 @@ teardown() {
     # Write the PR URL to a file for teardown cleanup
     echo "$pr_url" > "$CREATED_PR_URL_FILE"
 
-    # Verify the created PR's details using the gh CLI
-    local pr_json
-    pr_json=$(gh pr view "$pr_url" --json title,body,headRefName,state)
-    [ "$?" -eq 0 ]
-
-    # Assertions
+    # Verify the created PR's details using `gh` with `--jq` for robust parsing
     local created_title
-    created_title=$(echo "$pr_json" | grep '"title"' | sed 's/.*"title": "\(.*\)".*/\1/')
+    created_title=$(gh pr view "$pr_url" --json title --jq .title)
     [ "$created_title" = "$pr_title" ]
 
     local created_body
-    created_body=$(echo "$pr_json" | grep '"body"' | sed 's/.*"body": "\(.*\)".*/\1/')
-    # Using contains because JSON escaping can be tricky
+    created_body=$(gh pr view "$pr_url" --json body --jq .body)
     [[ "$created_body" == *"$pr_body"* ]]
 
     local head_ref_name
-    head_ref_name=$(echo "$pr_json" | grep '"headRefName"' | sed 's/.*"headRefName": "\(.*\)".*/\1/')
+    head_ref_name=$(gh pr view "$pr_url" --json headRefName --jq .headRefName)
     [[ "$head_ref_name" == "suggest-codex-"* ]]
 
     local pr_state
-    pr_state=$(echo "$pr_json" | grep '"state"' | sed 's/.*"state": "\(.*\)".*/\1/')
+    pr_state=$(gh pr view "$pr_url" --json state --jq .state)
     [ "$pr_state" = "OPEN" ]
+    
+    # Store fork URL and branch name for cleanup in teardown
+    local fork_url
+    fork_url=$(gh pr view "$pr_url" --json headRepository --jq .headRepository.url)
+    echo "$fork_url" > "$CREATED_FORK_URL_FILE"
+    echo "$head_ref_name" > "$CREATED_BRANCH_NAME_FILE"
 }
