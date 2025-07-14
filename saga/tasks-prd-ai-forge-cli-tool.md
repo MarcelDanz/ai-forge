@@ -105,26 +105,9 @@
     - [x] 5.3.5 Example for accessing help (`forge --help`, `forge init --help`, etc.).
   - [x] 5.4 Review all `README.md` additions for clarity, accuracy, and completeness, targeting a junior developer audience.
 
-- [x] 6.0 Implement automated tests for the CLI tool
-  - [x] 6.1 Set up a testing framework (e.g., `bats-core` or `shunit2`) and create a test runner script.
-  - [x] 6.2 Create `tests/test_cli_core.sh` to test help commands and error handling.
-  - [x] 6.3 Create `tests/test_forge_init.sh` to test the `init` command functionality.
-  - [x] 6.4 Create `tests/test_forge_update.sh` to test the `update` command functionality.
-  - [x] 6.5 Create `tests/test_forge_suggest_changes.sh` to test the `suggest-changes` command functionality.
-
-  - [x] 7.0 Debug and Fix Failing Automated Tests
-    - [x] 7.1 Fix failures in `tests/test_forge_init.sh`
-      - [x] 7.1.1 "init: creates codex, lore, and saga directories"
-      - [ ] 7.1.2 "init: copies codex folder correctly"
-      - [ ] 7.1.3 "init: copies lore/README.md and saga/README.md"
-      - [x] 7.1.4 "init: does not overwrite existing lore/README.md or saga/README.md"
-      - [ ] 7.1.5 "init: overwrites existing codex directory when confirmed"
-      - [x] 7.1.6 "init: does not overwrite existing codex if not confirmed"
-    - [x] 7.2 Fix failures in `tests/test_forge_suggest_changes.sh`
-      - [ ] 7.2.1 "suggest-changes: full successful run"
-      - [ ] 7.2.2 "suggest-changes: exits if local codex is older"
-      - [ ] 7.2.3 "suggest-changes: exits if no changes are detected"
-    - [x] 7.3 Fix failures in `tests/test_forge_update.sh`
-      - [x] 7.3.1 "update: replaces existing codex"
-      - [x] 7.3.2 "update: creates a backup when user says yes"
-      - [x] 7.3.3 "update: does not create backup when user says no"
+- [ ] 6.0 Refactor automated tests to use real APIs and fix failures
+  - [ ] 6.1 Remove mock git repository helpers from `tests/helpers.bash`.
+  - [ ] 6.2 Remove mock `gh` command helper from `tests/helpers.bash`.
+  - [ ] 6.3 Update test suites (`test_forge_init.sh`, `test_forge_update.sh`, `test_forge_suggest_changes.sh`) to work against the live `https://github.com/MarcelDanz/ai-forge.git` repository.
+  - [ ] 6.4 Fix the logic in `bin/forge.sh` for the `init` and `suggest-changes` commands to resolve underlying test failures.
+  - [ ] 6.5 Ensure all tests pass after refactoring and fixing the commands.
