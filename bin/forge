@@ -157,10 +157,10 @@ determine_bump_type() {
 
     (
         cd "$temp_repo_path" || exit 1
-        # Get summary of file changes (Added, Deleted, Modified) against the main branch
-        file_changes=$(git diff --name-status main..HEAD -- "$CODEX_DIR")
+        # Get summary of file changes (Added, Deleted, Modified) against the upstream main branch
+        file_changes=$(git diff --name-status upstream/main..HEAD -- "$CODEX_DIR")
         # Get summary of line changes
-        diff_stats=$(git diff --shortstat main..HEAD -- "$CODEX_DIR")
+        diff_stats=$(git diff --shortstat upstream/main..HEAD -- "$CODEX_DIR")
     )
 
     # FR5.4: MINOR bump for file additions or removals.
@@ -491,19 +491,46 @@ run_suggest_changes() {
     log_info "PR Body entered." # Not logging the body itself to keep logs concise
 
     check_git_installed
+    if ! command -v gh &> /dev/null || ! gh auth status &> /dev/null; then
+        log_error "GitHub CLI 'gh' is not installed or not authenticated. Please run 'gh auth login'."
+    fi
 
-    # TEMP_DIR is global and will be set here for cleanup by the existing trap
+    local username
+    if ! username=$(gh api user --jq .login); then
+        log_error "Failed to get GitHub username using 'gh api user'."
+    fi
+
+    # Ensure a fork exists. gh repo fork is idempotent.
+    log_info "Ensuring a fork of '$AI_FORGE_REPO_URL' exists for user '$username'..."
+    if ! gh repo fork "$AI_FORGE_REPO_URL" --clone=false --remote=false; then
+        log_error "Failed to create or verify your fork. Please check the output from 'gh' above."
+    fi
+
     TEMP_DIR=$(mktemp -d)
     if [ -z "$TEMP_DIR" ]; then
         log_error "Failed to create temporary directory."
     fi
-    trap cleanup_temp_dir EXIT INT TERM # Ensure trap is set for this function's scope
+    trap cleanup_temp_dir EXIT INT TERM
 
-    log_info "Cloning framework repository from $AI_FORGE_REPO_URL into a temporary directory..."
-    if ! git clone "$AI_FORGE_REPO_URL" "$TEMP_DIR"; then
-        log_error "Failed to clone the repository. Please check the URL and your network connection."
+    local fork_repo_name
+    fork_repo_name=$(basename "$AI_FORGE_REPO_URL" .git)
+    local fork_url="https://github.com/$username/$fork_repo_name.git"
+
+    log_info "Cloning your fork from '$fork_url'..."
+    if ! git clone "$fork_url" "$TEMP_DIR"; then
+        log_error "Failed to clone your fork. Please ensure it exists at '$fork_url'."
     fi
-    log_info "Repository cloned successfully into $TEMP_DIR"
+    log_info "Fork cloned successfully into '$TEMP_DIR'."
+
+    (
+        cd "$TEMP_DIR" || exit 1
+        log_info "Configuring upstream remote to '$AI_FORGE_REPO_URL'..."
+        if ! git remote | grep -q "^upstream$"; then
+            git remote add upstream "$AI_FORGE_REPO_URL"
+        fi
+        log_info "Fetching latest changes from upstream..."
+        git fetch upstream
+    )
 
     # --- Pre-change checks ---
     log_info "Performing pre-change checks..."
@@ -517,8 +544,17 @@ run_suggest_changes() {
     fi
 
     # 3.4.1 & 3.4.2: Get framework and local codex versions
+    # Create a temporary structure to hold the upstream readme to get the version
+    local upstream_readme_temp_dir
+    upstream_readme_temp_dir=$(mktemp -d -p "$TEMP_DIR")
+    mkdir -p "$upstream_readme_temp_dir/$CODEX_DIR"
+    (
+        cd "$TEMP_DIR" || exit 1
+        # Extract the upstream README file content without checking it out
+        git show upstream/main:"$CODEX_DIR/README.md" > "$upstream_readme_temp_dir/$CODEX_DIR/README.md"
+    )
     local framework_version
-    framework_version=$(get_codex_version "$TEMP_DIR")
+    framework_version=$(get_codex_version "$upstream_readme_temp_dir")
     log_info "Framework codex version: $framework_version"
 
     local local_version
@@ -544,10 +580,11 @@ run_suggest_changes() {
     log_info "Creating new branch '$new_branch_name' in the temporary repository..."
     (
         cd "$TEMP_DIR" || exit 1
-        if ! git checkout -b "$new_branch_name"; then
-            log_error "Failed to create new branch '$new_branch_name' in $TEMP_DIR."
+        # Create the new branch from the latest upstream main branch
+        if ! git checkout -b "$new_branch_name" upstream/main; then
+            log_error "Failed to create new branch '$new_branch_name' from upstream/main."
         fi
-        log_info "Successfully created and switched to branch '$new_branch_name'."
+        log_info "Successfully created and switched to branch '$new_branch_name' based on upstream/main."
     )
 
     # --- Apply local codex changes, determine version, and commit ---
@@ -633,15 +670,17 @@ run_suggest_changes() {
     log_info "You may be prompted by 'gh' to authenticate or create a fork."
     (
         cd "$TEMP_DIR" || exit 1
-        local username
-        if ! username=$(gh api user --jq .login); then
-            log_error "Failed to get GitHub username using 'gh api user'."
+        # We are in a clone of the user's fork, with 'upstream' pointing to the base repo.
+        # We need to push our new branch to our fork ('origin').
+        log_info "Pushing branch '$new_branch_name' to your fork ('origin')..."
+        # Use --force to overwrite a branch from a previous failed test run
+        if ! git push --force -u origin "$new_branch_name"; then
+            log_error "Failed to push new branch to your fork. Please check your permissions."
         fi
-        # Let gh handle everything. It will:
-        # 1. Ask the user to create a fork if one doesn't exist.
-        # 2. Push the current branch to that fork.
-        # 3. Create the pull request against the base repository.
-        gh pr create --repo "$AI_FORGE_REPO_URL" --title "$pr_title" --body "$pr_body" --head "$new_branch_name"
+        log_info "Branch pushed successfully."
+
+        # Now, create the PR. `gh` will detect the upstream repo automatically.
+        gh pr create --title "$pr_title" --body "$pr_body"
     )
     
     if [ $? -eq 0 ]; then

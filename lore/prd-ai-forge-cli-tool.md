@@ -85,11 +85,14 @@ The goal of the AI Forge CLI tool is to provide a simple, command-line interface
 *   **TC3:** **Framework Source:** The hardcoded URL for the AI Forge framework repository is `https://github.com/fork-base/ai-forge.git`.
 *   **TC4:** **`forge init` & `forge update` Data Fetching:** These commands will likely use `git clone --depth=1 --sparse` followed by `git sparse-checkout set codex lore saga` (or similar) or `git archive` to efficiently download only the required folders.
 *   **TC5:** **`forge suggest-changes` Workflow:**
-    1.  Temporarily clone the framework repository.
-    2.  Create a new branch (e.g., `suggest-codex-updates-<timestamp>`).
-    3.  Replace the `codex` directory in the cloned repository with the user's local `codex`.
-    4.  Commit the changes (including the automated version bump).
-    5.  Invoke `gh pr create`. The GitHub CLI will handle forking the repository, pushing the branch to the new fork, and opening the pull request against the base repository.
+    1.  Ensure the user has a fork of the framework repository using `gh repo fork`.
+    2.  Clone the user's fork into a temporary directory.
+    3.  Configure the original framework repository as the `upstream` remote and fetch it.
+    4.  Create a new branch from the latest `upstream/main`.
+    5.  Replace the `codex` directory in the new branch with the user's local `codex`.
+    6.  Commit the changes (including the automated version bump).
+    7.  Push the new branch to the user's fork (`origin`).
+    8.  Invoke `gh pr create` to open the pull request from the fork's new branch to the `upstream` repository's main branch.
 *   **TC6:** **Error Handling:** Scripts should use exit codes appropriately to signal success or failure.
 
 ## 8. Success Metrics
