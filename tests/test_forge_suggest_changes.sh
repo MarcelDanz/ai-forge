@@ -5,13 +5,14 @@ load 'helpers'
 setup() {
     setup_test_dir
 
-    # Check for required environment variables for live tests
-    if [ -z "${AI_FORGE_TEST_FORK_REPO:-}" ]; then
-        skip "AI_FORGE_TEST_FORK_REPO environment variable is not set. Skipping live PR test."
-    fi
     # Ensure gh is installed and authenticated
     if ! gh auth status &> /dev/null; then
         skip "GitHub CLI 'gh' is not authenticated. Skipping live PR test."
+    fi
+    
+    setup_live_fork
+    if [ -z "$AI_FORGE_LIVE_TEST_FORK" ]; then
+        skip "Failed to create a temporary live fork for testing."
     fi
     
     # The test will write the created PR URL to this file for cleanup
@@ -20,6 +21,7 @@ setup() {
 
 teardown() {
     teardown_pr
+    teardown_live_fork
     teardown_test_dir
 }
 
@@ -34,8 +36,8 @@ teardown() {
     # Prepare inputs for the command
     local pr_title="[TEST] Automated PR via forge suggest-changes"
     # Add a timestamp to the body to ensure it's unique
-    local pr_body="This is an automated test PR created at $(date). It should be closed automatically."
-    local user_fork="$AI_FORGE_TEST_FORK_REPO"
+    local pr_body="This is an automated test PR created at $(date). It should be closed and its fork deleted automatically."
+    local user_fork="$AI_FORGE_LIVE_TEST_FORK"
     
     local input
     # The final blank line in the body input is to finish the multiline prompt
