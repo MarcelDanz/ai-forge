@@ -41,7 +41,7 @@ teardown() {
     # The input is piped to the script.
     # It contains the PR title, body, a 'y' for the gh fork prompt,
     # and a final 'y' for the version bump confirmation.
-    run bash -c "printf '%s\n%s\n\n%s\n%s\n' \"$pr_title\" \"$pr_body\" y y | $FORGE_SCRIPT suggest-changes"
+    printf '%s\n%s\n\n%s\n%s\n' "$pr_title" "$pr_body" "y" "y" | run "$FORGE_SCRIPT" suggest-changes
     [ "$status" -eq 0 ]
     
     # Extract the PR URL from the output
