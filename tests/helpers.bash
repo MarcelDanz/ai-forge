@@ -24,7 +24,7 @@ teardown_test_dir() {
 
 # Placeholders for test artifacts that need to be cleaned up
 export CREATED_PR_URL_FILE
-export CREATED_FORK_URL_FILE
+export CREATED_FORK_REPO_FILE
 export CREATED_BRANCH_NAME_FILE
 
 # Cleans up a pull request and its remote branch created during a test run.
@@ -47,28 +47,21 @@ teardown_pr() {
     fi
 
     # Delete the remote branch from the fork
-    if [ -f "$CREATED_FORK_URL_FILE" ] && [ -f "$CREATED_BRANCH_NAME_FILE" ]; then
-        local fork_url
-        fork_url=$(cat "$CREATED_FORK_URL_FILE")
-        rm -f "$CREATED_FORK_URL_FILE"
+    if [ -f "$CREATED_FORK_REPO_FILE" ] && [ -f "$CREATED_BRANCH_NAME_FILE" ]; then
+        local fork_owner_repo
+        fork_owner_repo=$(cat "$CREATED_FORK_REPO_FILE")
+        rm -f "$CREATED_FORK_REPO_FILE"
 
         local branch_name
         branch_name=$(cat "$CREATED_BRANCH_NAME_FILE")
         rm -f "$CREATED_BRANCH_NAME_FILE"
 
-        if [ -n "$fork_url" ] && [ -n "$branch_name" ]; then
-            echo "INFO: Deleting remote branch '$branch_name' from fork..."
-            local fork_owner_repo
-            # Extract owner/repo from URL like https://github.com/owner/repo.git
-            fork_owner_repo=$(echo "$fork_url" | sed -n 's|https://github.com/\(.*\)\.git$|\1|p')
-            if [ -n "$fork_owner_repo" ]; then
-                local ref_path="heads/$branch_name"
-                # Use `gh api` to delete the git ref (the branch)
-                if ! gh api --method DELETE "repos/$fork_owner_repo/git/refs/$ref_path" > /dev/null; then
-                     echo "WARN: Failed to delete remote branch '$branch_name' from fork. It may require manual cleanup."
-                fi
-            else
-                 echo "WARN: Could not parse fork owner/repo from URL '$fork_url'."
+        if [ -n "$fork_owner_repo" ] && [ -n "$branch_name" ]; then
+            echo "INFO: Deleting remote branch '$branch_name' from fork '$fork_owner_repo'..."
+            local ref_path="heads/$branch_name"
+            # Use `gh api` to delete the git ref (the branch)
+            if ! gh api --method DELETE "repos/$fork_owner_repo/git/refs/$ref_path" > /dev/null; then
+                 echo "WARN: Failed to delete remote branch '$branch_name' from fork. It may require manual cleanup."
             fi
         fi
     fi

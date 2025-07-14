@@ -103,10 +103,5 @@ The goal of the AI Forge CLI tool is to provide a simple, command-line interface
 *   **SM4:** Observed reduction in inconsistencies in `codex` usage across projects.
 *   **SM5:** Maintainability of the CLI tool itself, indicated by ease of bug fixing and feature additions.
 
-## 9. Open Questions
-
-*   **OQ1 (Resolved):** For `forge suggest-changes`, the tool will prompt the user for their fork name (see FR3.3).
-*   **OQ2 (Resolved):** For `codex` versioning, the tool will automatically handle version bumping as per FR5.4.
-
 ---
 This PRD is based on the initial feature description and subsequent clarifications. It should be considered a living document and may be updated as the project progresses.

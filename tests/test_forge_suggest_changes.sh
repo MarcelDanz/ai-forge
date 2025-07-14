@@ -12,7 +12,7 @@ setup() {
     
     # Files to store artifacts for cleanup in teardown
     CREATED_PR_URL_FILE="$BATS_TEST_DIR/created_pr_url.txt"
-    CREATED_FORK_URL_FILE="$BATS_TEST_DIR/created_fork_url.txt"
+    CREATED_FORK_REPO_FILE="$BATS_TEST_DIR/created_fork_repo.txt"
     CREATED_BRANCH_NAME_FILE="$BATS_TEST_DIR/created_branch_name.txt"
 }
 
@@ -82,9 +82,9 @@ teardown() {
     pr_state=$(gh pr view "$pr_url" --json state --jq .state)
     [ "$pr_state" = "OPEN" ]
     
-    # Store fork URL and branch name for cleanup in teardown
-    local fork_url
-    fork_url=$(gh pr view "$pr_url" --json headRepository --jq .headRepository.url)
-    echo "$fork_url" > "$CREATED_FORK_URL_FILE"
+    # Store fork owner/repo and branch name for cleanup in teardown
+    local fork_owner_repo
+    fork_owner_repo=$(gh pr view "$pr_url" --json headRepository --jq .headRepository.nameWithOwner)
+    echo "$fork_owner_repo" > "$CREATED_FORK_REPO_FILE"
     echo "$head_ref_name" > "$CREATED_BRANCH_NAME_FILE"
 }
