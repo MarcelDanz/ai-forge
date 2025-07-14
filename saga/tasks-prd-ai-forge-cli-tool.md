@@ -112,19 +112,19 @@
   - [x] 6.4 Create `tests/test_forge_update.sh` to test the `update` command functionality.
   - [x] 6.5 Create `tests/test_forge_suggest_changes.sh` to test the `suggest-changes` command functionality.
 
-  - [ ] 7.0 Debug and Fix Failing Automated Tests
-    - [ ] 7.1 Fix failures in `tests/test_forge_init.sh`
+  - [x] 7.0 Debug and Fix Failing Automated Tests
+    - [x] 7.1 Fix failures in `tests/test_forge_init.sh`
       - [x] 7.1.1 "init: creates codex, lore, and saga directories"
-      - [ ] 7.1.2 "init: copies codex folder correctly"
-      - [ ] 7.1.3 "init: copies lore/README.md and saga/README.md"
-      - [ ] 7.1.4 "init: does not overwrite existing lore/README.md or saga/README.md"
-      - [ ] 7.1.5 "init: overwrites existing codex directory when confirmed"
-      - [ ] 7.1.6 "init: does not overwrite existing codex if not confirmed"
-    - [ ] 7.2 Fix failures in `tests/test_forge_suggest_changes.sh`
-      - [ ] 7.2.1 "suggest-changes: full successful run"
-      - [ ] 7.2.2 "suggest-changes: exits if local codex is older"
-      - [ ] 7.2.3 "suggest-changes: exits if no changes are detected"
-    - [ ] 7.3 Fix failures in `tests/test_forge_update.sh`
-      - [ ] 7.3.1 "update: replaces existing codex"
-      - [ ] 7.3.2 "update: creates a backup when user says yes"
-      - [ ] 7.3.3 "update: does not create backup when user says no"
+      - [x] 7.1.2 "init: copies codex folder correctly"
+      - [x] 7.1.3 "init: copies lore/README.md and saga/README.md"
+      - [x] 7.1.4 "init: does not overwrite existing lore/README.md or saga/README.md"
+      - [x] 7.1.5 "init: overwrites existing codex directory when confirmed"
+      - [x] 7.1.6 "init: does not overwrite existing codex if not confirmed"
+    - [x] 7.2 Fix failures in `tests/test_forge_suggest_changes.sh`
+      - [x] 7.2.1 "suggest-changes: full successful run"
+      - [x] 7.2.2 "suggest-changes: exits if local codex is older"
+      - [x] 7.2.3 "suggest-changes: exits if no changes are detected"
+    - [x] 7.3 Fix failures in `tests/test_forge_update.sh`
+      - [x] 7.3.1 "update: replaces existing codex"
+      - [x] 7.3.2 "update: creates a backup when user says yes"
+      - [x] 7.3.3 "update: does not create backup when user says no"

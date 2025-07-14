@@ -281,9 +281,9 @@ run_init() {
     log_info "Archiving required files from the local clone..."
 
     # Paths to fetch from the repository
-    local paths_to_fetch="$CODEX_DIR lore/README.md saga/README.md"
+    local -a paths_to_fetch=("$CODEX_DIR" "lore/README.md" "saga/README.md")
 
-    if (cd "$CLONE_DIR" && git archive HEAD $paths_to_fetch) | tar -x -C "$TEMP_DIR"; then
+    if (cd "$CLONE_DIR" && git archive HEAD "${paths_to_fetch[@]}") | tar -x -C "$TEMP_DIR"; then
         log_info "Successfully fetched files into $TEMP_DIR:"
         # List fetched top-level items in TEMP_DIR for confirmation
         ls "$TEMP_DIR"
