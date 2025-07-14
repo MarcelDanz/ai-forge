@@ -10,7 +10,7 @@ set -o pipefail
 
 # --- Configuration ---
 # The official AI Forge framework repository
-AI_FORGE_REPO_URL="https://github.com/MarcelDanz/ai-forge.git"
+AI_FORGE_REPO_URL="https://github.com/fork-base/ai-forge.git"
 CODEX_DIR="codex"
 LORE_DIR="lore"
 SAGA_DIR="saga"

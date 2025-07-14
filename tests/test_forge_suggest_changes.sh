@@ -47,7 +47,7 @@ teardown() {
     
     # Extract the PR URL from the output
     local pr_url
-    pr_url=$(echo "$output" | grep -o 'https://github.com/MarcelDanz/ai-forge/pull/[0-9]*' | head -n1)
+    pr_url=$(echo "$output" | grep -o 'https://github.com/fork-base/ai-forge/pull/[0-9]*' | head -n1)
 
     if [ -z "$pr_url" ]; then
         echo "Error: Could not extract PR URL from the command output."

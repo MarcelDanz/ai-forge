@@ -25,7 +25,7 @@ The goal of the AI Forge CLI tool is to provide a simple, command-line interface
 ## 4. Functional Requirements
 
 ### FR1: `forge init` Command
-*   **FR1.1:** The `forge init` command SHALL fetch the `codex` folder, the `lore/README.md` file, and the `saga/README.md` file from the official AI Forge framework repository located at `https://github.com/MarcelDanz/ai-forge.git`.
+*   **FR1.1:** The `forge init` command SHALL fetch the `codex` folder, the `lore/README.md` file, and the `saga/README.md` file from the official AI Forge framework repository located at `https://github.com/fork-base/ai-forge.git`.
 *   **FR1.2:** The command SHALL copy the fetched `codex` folder into the current directory. It SHALL create the `lore` and `saga` directories if they do not exist. It SHALL then copy the fetched `lore/README.md` into the `lore` directory and `saga/README.md` into the `saga` directory.
 *   **FR1.3:** If a `codex` folder already exists in the target project directory, the user SHALL be prompted for confirmation before it is overridden by the version from the framework.
 *   **FR1.4:** The `lore` and `saga` directories SHALL be created if they do not exist in the target project directory. The `lore/README.md` and `saga/README.md` files from the framework SHALL be copied into their respective directories.
@@ -82,7 +82,7 @@ The goal of the AI Forge CLI tool is to provide a simple, command-line interface
 *   **TC2:** **Dependencies:**
     *   `git` (command-line tool) is a mandatory dependency.
     *   `gh` (GitHub CLI) is a mandatory dependency for the `forge suggest-changes` command.
-*   **TC3:** **Framework Source:** The hardcoded URL for the AI Forge framework repository is `https://github.com/MarcelDanz/ai-forge.git`.
+*   **TC3:** **Framework Source:** The hardcoded URL for the AI Forge framework repository is `https://github.com/fork-base/ai-forge.git`.
 *   **TC4:** **`forge init` & `forge update` Data Fetching:** These commands will likely use `git clone --depth=1 --sparse` followed by `git sparse-checkout set codex lore saga` (or similar) or `git archive` to efficiently download only the required folders.
 *   **TC5:** **`forge suggest-changes` Workflow:**
     1.  Temporarily clone the framework repository.

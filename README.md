@@ -17,7 +17,7 @@ To use the `forge` CLI tool, you need to make the `bin/forge.sh` script availabl
 
 1.  **Clone the repository:**
     ```bash
-    git clone https://github.com/MarcelDanz/ai-forge.git
+    git clone https://github.com/fork-base/ai-forge.git
     cd ai-forge
     ```
 
