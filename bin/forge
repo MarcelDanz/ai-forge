@@ -634,7 +634,8 @@ run_suggest_changes() {
     (
         cd "$TEMP_DIR" || exit 1
         # gh will handle forking, pushing, and PR creation.
-        gh pr create --title "$pr_title" --body "$pr_body" --head "$new_branch_name"
+        # By default, gh uses the current branch as the head.
+        gh pr create --title "$pr_title" --body "$pr_body"
     )
     
     if [ $? -eq 0 ]; then
