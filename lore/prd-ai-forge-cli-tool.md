@@ -40,8 +40,8 @@ The goal of the AI Forge CLI tool is to provide a simple, command-line interface
 ### FR3: `forge suggest-changes` Command
 *   **FR3.1:** The `forge suggest-changes` command SHALL facilitate proposing changes from the project's local `codex` folder to the AI Forge framework repository.
 *   **FR3.2:** The command SHALL (internally) clone the AI Forge framework repository, create a new branch, and replace the `codex` folder in this branch with the project's local `codex` folder.
-*   **FR3.3:** The command SHALL prompt the user for a title and a description for the pull request. It SHALL also prompt the user for the name of their GitHub fork (e.g., `username/ai-forge`) to push the changes to. The command SHALL then commit the changes, push the new branch to the specified user fork, and attempt to create a pull request against the main `https://github.com/MarcelDanz/ai-forge.git` repository. The user must have `git` and potentially GitHub CLI (`gh`) configured for authentication.
-*   **FR3.4:** If the process of preparing changes (e.g., pushing the new branch or creating the PR) fails (e.g., due to inability to push to a remote, or other git errors), the command SHALL inform the user with a verbose error message. It SHOULD advise the user to ensure their project's `codex` is up-to-date with the framework (e.g., by running `forge update`, manually resolving any conflicts) and then try `forge suggest-changes` again.
+*   **FR3.3:** The command SHALL prompt the user for a title and a description for the pull request. It SHALL rely on the GitHub CLI (`gh`) to handle forking the repository, pushing the new branch, and creating the pull request. The user must have `gh` installed and authenticated.
+*   **FR3.4:** If the `gh pr create` process fails, the command SHALL inform the user with a verbose error message from the `gh` tool. It SHOULD advise the user to ensure their local `codex` is up-to-date with the framework and that their `gh` CLI is properly authenticated.
 *   **FR3.5:** The pull request created SHALL use the title and description provided by the user.
 
 ### FR4: General CLI Behavior
@@ -81,16 +81,15 @@ The goal of the AI Forge CLI tool is to provide a simple, command-line interface
 *   **TC1:** **Implementation:** The CLI tool will be developed as `.sh` (shell script) files.
 *   **TC2:** **Dependencies:**
     *   `git` (command-line tool) is a mandatory dependency.
-    *   `gh` (GitHub CLI) is highly recommended for seamless pull request creation by `forge suggest-changes`. If not available, the script should inform the user about alternative steps.
+    *   `gh` (GitHub CLI) is a mandatory dependency for the `forge suggest-changes` command.
 *   **TC3:** **Framework Source:** The hardcoded URL for the AI Forge framework repository is `https://github.com/MarcelDanz/ai-forge.git`.
 *   **TC4:** **`forge init` & `forge update` Data Fetching:** These commands will likely use `git clone --depth=1 --sparse` followed by `git sparse-checkout set codex lore saga` (or similar) or `git archive` to efficiently download only the required folders.
 *   **TC5:** **`forge suggest-changes` Workflow:**
     1.  Temporarily clone the framework repository.
     2.  Create a new branch (e.g., `suggest-codex-updates-<timestamp>`).
     3.  Replace the `codex` directory in the cloned repository with the user's local `codex`.
-    4.  Commit the changes.
-    5.  Push the new branch to a remote (ideally the user's fork, or directly if they have permissions and choose to do so).
-    6.  Create a pull request using `gh pr create` or provide instructions if `gh` is not available.
+    4.  Commit the changes (including the automated version bump).
+    5.  Invoke `gh pr create`. The GitHub CLI will handle forking the repository, pushing the branch to the new fork, and opening the pull request against the base repository.
 *   **TC6:** **Error Handling:** Scripts should use exit codes appropriately to signal success or failure.
 
 ## 8. Success Metrics

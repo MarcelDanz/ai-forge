@@ -10,18 +10,12 @@ setup() {
         skip "GitHub CLI 'gh' is not authenticated. Skipping live PR test."
     fi
     
-    setup_live_fork
-    if [ -z "$AI_FORGE_LIVE_TEST_FORK" ]; then
-        skip "Failed to create a temporary live fork for testing."
-    fi
-    
     # The test will write the created PR URL to this file for cleanup
     CREATED_PR_URL_FILE="$BATS_TEST_DIR/created_pr_url.txt"
 }
 
 teardown() {
     teardown_pr
-    teardown_live_fork
     teardown_test_dir
 }
 
@@ -36,13 +30,15 @@ teardown() {
     # Prepare inputs for the command
     local pr_title="[TEST] Automated PR via forge suggest-changes"
     # Add a timestamp to the body to ensure it's unique
-    local pr_body="This is an automated test PR created at $(date). It should be closed and its fork deleted automatically."
-    local user_fork="$AI_FORGE_LIVE_TEST_FORK"
+    local pr_body="This is an automated test PR created at $(date). It should be closed automatically."
     
     local input
-    # The final blank line in the body input is to finish the multiline prompt
-    # The final 'y' is to confirm the version bump
-    printf -v input "%s\n%s\n\n%s\ny\n" "$pr_title" "$pr_body" "$user_fork"
+    # Input stream for the script:
+    # 1. PR Title
+    # 2. PR Body (multiline, terminated by an empty line)
+    # 3. 'gh' confirmation to fork the repo ('y')
+    # 4. 'forge' confirmation for the suggested version bump ('y')
+    printf -v input "%s\n%s\n\n%s\n%s\n" "$pr_title" "$pr_body" "y" "y"
 
     # Run the command and capture the output
     # We expect 'gh pr create' to be called, which will output the PR URL

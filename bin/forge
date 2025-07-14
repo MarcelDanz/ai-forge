@@ -490,27 +490,6 @@ run_suggest_changes() {
     done
     log_info "PR Body entered." # Not logging the body itself to keep logs concise
 
-    local user_fork
-    while true; do
-        read -r -p "Enter your GitHub fork name (e.g., username/ai-forge): " user_fork
-        if [ -z "$user_fork" ]; then
-            log_info "GitHub fork name cannot be empty. Please try again."
-            continue
-        fi
-
-        # Validate format: owner/repo
-        if ! [[ "$user_fork" =~ ^[a-zA-Z0-9-]+/[a-zA-Z0-9_.-]+$ ]]; then
-            log_info "Invalid GitHub fork name format. Expected 'owner/repo'."
-            log_info "Owner and repo names can contain alphanumeric characters and hyphens."
-            log_info "Repo names can additionally contain underscores and periods."
-            log_info "Example: 'your-username/ai-forge-fork'. Please try again."
-            continue
-        fi
-        
-        break # Valid format
-    done
-    log_info "User fork entered: '$user_fork'"
-
     check_git_installed
 
     # TEMP_DIR is global and will be set here for cleanup by the existing trap
@@ -643,67 +622,26 @@ run_suggest_changes() {
         log_info "Codex changes committed successfully."
     )
 
-    # --- Push changes to user's fork ---
-    log_info "Adding user's fork as a remote..."
-    # Allow override for testing purposes
-    local fork_url="${AI_FORGE_FORK_URL_OVERRIDE:-https://github.com/$user_fork.git}"
-    
-    (
-        cd "$TEMP_DIR" || exit 1
-        # This logic handles cases where the script might be re-run after a failure.
-        if git remote | grep -q "^userfork$"; then
-            git remote set-url userfork "$fork_url"
-        else
-            git remote add userfork "$fork_url"
-        fi
-        log_info "Remote 'userfork' configured for $fork_url."
-
-        log_info "Pushing branch '$new_branch_name' to '$user_fork'..."
-        if ! git push -u userfork "$new_branch_name"; then
-            log_error "Failed to push branch to fork. Please check your credentials and repository permissions."
-            log_error "You may need to configure a personal access token for git."
-        fi
-        log_info "Branch pushed successfully to your fork."
-    )
-
     # --- Create Pull Request ---
-    log_info "Attempting to create a Pull Request..."
+    log_info "Attempting to create a Pull Request using 'gh'..."
     
     if ! command -v gh &> /dev/null; then
-        log_info "GitHub CLI 'gh' is not installed. Cannot create PR automatically."
-        log_info "Please install gh from https://cli.github.com/ for the best experience."
-    else
-        log_info "Using 'gh' to create Pull Request."
-        (
-            cd "$TEMP_DIR" || exit 1
-            # The --repo flag specifies the upstream repository.
-            # gh will automatically use the pushed branch from the fork.
-            gh pr create --repo "$AI_FORGE_REPO_URL" --title "$pr_title" --body "$pr_body"
-        )
-        
-        if [ $? -eq 0 ]; then
-            log_info "Pull Request created successfully!"
-            log_info "Forge suggest-changes process completed."
-            # The trap will handle cleanup on exit.
-            exit 0
-        else
-            log_info "Failed to create Pull Request using 'gh'. This can happen due to missing permissions or other issues."
-            log_info "Falling back to manual instructions."
-        fi
+        log_error "GitHub CLI 'gh' is not installed. The 'suggest-changes' command requires it. Please install from https://cli.github.com/."
     fi
 
-    # Manual instructions section
-    log_info "-----------------------------------------------------------------"
-    log_info "MANUAL ACTION REQUIRED: Create Your Pull Request"
-    log_info "-----------------------------------------------------------------"
-    log_info "Please create the Pull Request manually by visiting this URL:"
+    log_info "Using 'gh' to fork, push, and create a Pull Request."
+    log_info "You may be prompted by 'gh' to authenticate or create a fork."
+    (
+        cd "$TEMP_DIR" || exit 1
+        # gh will handle forking, pushing, and PR creation.
+        gh pr create --title "$pr_title" --body "$pr_body" --head "$new_branch_name"
+    )
     
-    local user_fork_owner
-    user_fork_owner=$(echo "$user_fork" | cut -d/ -f1)
-    local pr_url="https://github.com/MarcelDanz/ai-forge/compare/main...${user_fork_owner}:${new_branch_name}"
-    
-    log_info "$pr_url"
-    log_info "-----------------------------------------------------------------"
+    if [ $? -eq 0 ]; then
+        log_info "Pull Request created successfully!"
+    else
+        log_error "Failed to create Pull Request. Please check the output from 'gh' above for details."
+    fi
     log_info "Forge suggest-changes process completed."
 }
 
