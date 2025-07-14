@@ -34,3 +34,4 @@ The `rules/` directory defines the **core principles, patterns, and constraints*
 
 
 > *“The rules are not suggestions. They are the law and written in stone.”*
+## New Automated Test Rule
