@@ -633,9 +633,15 @@ run_suggest_changes() {
     log_info "You may be prompted by 'gh' to authenticate or create a fork."
     (
         cd "$TEMP_DIR" || exit 1
+        local username
+        if ! username=$(gh api user --jq .login); then
+            log_error "Failed to get GitHub username using 'gh api user'."
+        fi
+        local head_ref="$username:$new_branch_name"
+        log_info "Constructed head reference for PR: $head_ref"
+
         # gh will handle forking, pushing, and PR creation.
-        # By default, gh uses the current branch as the head.
-        gh pr create --title "$pr_title" --body "$pr_body"
+        gh pr create --title "$pr_title" --body "$pr_body" --head "$head_ref"
     )
     
     if [ $? -eq 0 ]; then
