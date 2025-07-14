@@ -22,24 +22,25 @@ teardown_test_dir() {
 }
 
 
-# Creates a mock 'gh' command that records its arguments.
-# The path to the mock bin is prepended to PATH.
-# The arguments are written to MOCK_GH_ARGS_FILE.
-setup_mock_gh() {
-    MOCK_BIN_DIR=$(mktemp -d)
-    export MOCK_GH_ARGS_FILE
-    MOCK_GH_ARGS_FILE=$(mktemp)
-    
-    cat <<-'EOF' > "$MOCK_BIN_DIR/gh"
-#!/bin/bash
-echo "$@" > "$MOCK_GH_ARGS_FILE"
-exit 0
-EOF
-    chmod +x "$MOCK_BIN_DIR/gh"
-    export PATH="$MOCK_BIN_DIR:$PATH"
-}
+# Placeholder for PR URL created during a test run
+export CREATED_PR_URL_FILE
 
-teardown_mock_gh() {
-    rm -rf "$MOCK_BIN_DIR"
-    rm -f "$MOCK_GH_ARGS_FILE"
+# Cleans up a pull request created during a test run.
+# This function should be called from the teardown function of a test file.
+teardown_pr() {
+    if [ -f "$CREATED_PR_URL_FILE" ]; then
+        local pr_url
+        pr_url=$(cat "$CREATED_PR_URL_FILE")
+        if [ -n "$pr_url" ];
+        then
+            echo "INFO: Cleaning up PR: $pr_url"
+            # Close the PR without prompting for confirmation
+            if gh pr view "$pr_url" > /dev/null 2>&1; then
+                gh pr close "$pr_url" --comment "Closed for cleanup after automated test." || echo "WARN: Failed to close PR $pr_url. It may need manual cleanup."
+            else
+                echo "WARN: PR $pr_url not found. It might have been closed already."
+            fi
+        fi
+        rm -f "$CREATED_PR_URL_FILE"
+    fi
 }
