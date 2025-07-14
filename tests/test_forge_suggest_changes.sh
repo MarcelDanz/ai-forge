@@ -33,16 +33,20 @@ teardown() {
     local pr_body="This is an automated test PR created at $(date). It should be closed automatically."
     
     local input
+    # Prepare an input file for the script prompts
+    local input_file
+    input_file=$(mktemp)
+
     # Input stream for the script:
     # 1. PR Title
     # 2. PR Body (multiline, terminated by an empty line)
-    # 3. 'gh' confirmation to fork the repo ('y')
-    # 4. 'forge' confirmation for the suggested version bump ('y')
-    local input
-    printf -v input "%s\n%s\n\n%s\n%s\n" "$pr_title" "$pr_body" "y" "y"
+    # 3. 'forge' confirmation for the suggested version bump ('y')
+    # 4. `gh` prompt to create a fork ('y')
+    printf "%s\n%s\n\n%s\n%s\n" "$pr_title" "$pr_body" "y" "y" > "$input_file"
 
-    # Use a "here string" (`<<<`) to provide input, which is more robust than piping to `run`.
-    run "$FORGE_SCRIPT" suggest-changes <<< "$input"
+    # Redirect input from the file, which is the most robust method for tests
+    run "$FORGE_SCRIPT" suggest-changes < "$input_file"
+    rm "$input_file"
     [ "$status" -eq 0 ]
     
     # Extract the PR URL from the output
