@@ -640,8 +640,30 @@ run_suggest_changes() {
         local head_ref="$username:$new_branch_name"
         log_info "Constructed head reference for PR: $head_ref"
 
-        # gh will handle forking, pushing, and PR creation.
-        gh pr create --title "$pr_title" --body "$pr_body" --head "$head_ref"
+        # Manually push the branch to the user's fork first.
+        # This is more explicit and reliable than having gh pr create do everything at once.
+        # It requires that the user running the command has a fork of the repository.
+        local fork_repo_name
+        fork_repo_name=$(basename "$AI_FORGE_REPO_URL" .git)
+        local fork_url="https://github.com/$username/$fork_repo_name.git"
+        
+        log_info "Adding user's fork as a remote: $fork_url"
+        # Use set-url in case the remote exists from a previous step (less likely with mktemp, but safer).
+        if git remote | grep -q "^userfork$"; then
+            git remote set-url userfork "$fork_url"
+        else
+            git remote add userfork "$fork_url"
+        fi
+
+        log_info "Pushing branch '$new_branch_name' to user's fork..."
+        # Using --force to overwrite a branch from a previous failed test run.
+        if ! git push --force -u userfork "$new_branch_name"; then
+            log_error "Failed to push to fork at $fork_url. Ensure the fork exists and you have push permissions."
+        fi
+        log_info "Branch pushed successfully."
+
+        # Now that the branch exists on the remote fork, create the PR.
+        gh pr create --repo "$AI_FORGE_REPO_URL" --title "$pr_title" --body "$pr_body" --head "$head_ref"
     )
     
     if [ $? -eq 0 ]; then
