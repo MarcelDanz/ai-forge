@@ -28,10 +28,9 @@ teardown() {
     local pr_title="Test PR Title"
     local pr_body="Test PR Body"
     local user_fork="testuser/ai-forge-fork"
-    local new_version_confirm="Y"
     
     local input
-    printf -v input "%s\n%s\n\n%s\n%s\n" "$pr_title" "$pr_body" "$user_fork" "$new_version_confirm"
+    printf -v input "%s\n%s\n\n%s\n" "$pr_title" "$pr_body" "$user_fork"
 
     # Override the fork URL to point to our local bare repo for testing
     export AI_FORGE_FORK_URL_OVERRIDE="$USER_FORK_REPO_DIR"
