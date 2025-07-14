@@ -665,7 +665,8 @@ shift # Remove command from arguments, rest are options for the command
 
 case "$COMMAND" in
     init|update|suggest-changes)
-        "run_$COMMAND" "$@"
+        # Replace hyphens with underscores to construct the function name
+        "run_${COMMAND//-/_}" "$@"
         ;;
     help)
         show_help "${1:-}"
