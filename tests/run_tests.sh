@@ -14,4 +14,4 @@ fi
 export PATH="$(pwd)/tests/bats/bin:$PATH"
 
 # Run all test files ending in .bats or .sh
-bats tests/test_*.sh
+bats --print-output-on-failure tests/test_*.sh
