@@ -112,5 +112,5 @@
 - [ ] 7.0 Implement tests for `suggest-changes`
   - [x] 7.1 Create `tests/test_forge_suggest_changes.sh`.
   - [x] 7.2 Remove mock `gh` helper from `tests/helpers.bash`.
-  - [x] 7.3 Update tests to use a local bare git repository as a fork.
-  - [ ] 7.4 Ensure all `suggest-changes` tests pass with the local fork setup.
+  - [x] 7.3 Update tests to use the real `gh` CLI and a live GitHub fork.
+  - [ ] 7.4 Ensure all `suggest-changes` tests pass.
