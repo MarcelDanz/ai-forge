@@ -113,4 +113,4 @@
   - [x] 7.1 Create `tests/test_forge_suggest_changes.sh`.
   - [x] 7.2 Remove mock `gh` helper from `tests/helpers.bash`.
   - [x] 7.3 Update tests to use the real `gh` CLI and a live GitHub fork.
-  - [x] 7.4 Ensure all `suggest-changes` tests pass.
+  - [ ] 7.4 Ensure all `suggest-changes` tests pass.
