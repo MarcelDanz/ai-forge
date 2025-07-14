@@ -23,7 +23,7 @@ To use the `forge` CLI tool, you need to make the `bin/forge.sh` script availabl
 
 2.  **Make the script executable:**
     ```bash
-    chmod +x bin/forge.sh
+    chmod +x bin/forge
     ```
 
 3.  **Add the `bin` directory to your PATH:**
@@ -40,12 +40,6 @@ To use the `forge` CLI tool, you need to make the `bin/forge.sh` script availabl
     source ~/.zshrc
     ```
     Replace `/path/to/your/ai-forge` with the actual absolute path.
-
-4.  **(Optional) Create a convenient `forge` command:**
-    To use the shorter `forge` command instead of `forge.sh`, you can create a symbolic link. This command, run from the `ai-forge` project root, creates the link inside the `bin` directory:
-    ```bash
-    (cd bin && ln -s forge.sh forge)
-    ```
 
 ## Usage
 
