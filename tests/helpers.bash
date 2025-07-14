@@ -2,7 +2,7 @@
 
 # Make the forge script available to the tests
 export FORGE_SCRIPT
-FORGE_SCRIPT="$(pwd)/bin/forge.sh"
+FORGE_SCRIPT="$(pwd)/bin/forge"
 
 # Creates a temporary directory for a test to run in.
 # The path to the directory is stored in the global BATS_TEST_DIR variable.
